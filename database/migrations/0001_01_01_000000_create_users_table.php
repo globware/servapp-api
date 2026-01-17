@@ -13,10 +13,27 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('firstname');
+            $table->string('surname');
             $table->string('email')->unique();
+            $table->string("phone_number");
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
+            $table->decimal('provider_id', 65, 0)->nullable();
+            $table->foreignId("photo_id")->nullable();
+            $table->foreignId("location_id")->nullable();
+            $table->foreignId("state_id")->nullable();
+            $table->foreignId("country_id")->nullable();
+            $table->integer("tokens")->default(0);
+            $table->foreignId("identification_id")->nullable();
+            $table->string("identification_no")->nullable();
+            $table->boolean("has_service")->default(false);
+            $table->string("referral_code");
+            $table->foreignId("referred_by")->nullable();
+            $table->boolean("suspended")->default(false);
+            $table->dateTime("last_login")->nullable();
+            $table->string("refresh_token")->nullable();
+            $table->string("refresh_token_device")->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

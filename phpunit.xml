@@ -18,6 +18,7 @@
         </include>
     </source>
     <php>
+        <!-- <env name="APP_KEY" value="base64:W1kDqjKt6PIP/1234567890abcdefghijklmnopqrstuvwxyz="/> -->
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
@@ -30,5 +31,6 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="JWT_SECRET" value="test-jwt-secret-key-for-testing-only"/>
     </php>
 </phpunit>

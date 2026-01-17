@@ -123,4 +123,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'admin_domain' => env('ADMIN_DOMAIN', 'admin.servappglobal.com'),
+    'api_domain'   => env('API_DOMAIN', 'api.servappglobal.com'),
+
+
 ];
