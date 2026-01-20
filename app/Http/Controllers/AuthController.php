@@ -97,8 +97,9 @@ class AuthController extends Controller
         }
     }
     
-    public function login(Login $request)
+    public function login(Request $request)
     {
+    dd('hello');
         $credentials = $request->only('email', 'password');
 
         try {
