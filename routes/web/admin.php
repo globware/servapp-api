@@ -1,7 +1,7 @@
 <?php
 
-
-
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\DashboardController;
 
 Route::middleware('guest:web')->group(function () {
     Route::get('login', [AuthController::class, 'login'])->name('login');

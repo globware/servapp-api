@@ -1,9 +1,5 @@
 <?php
 
-
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
-
 // Route::get('/', function () {
 //     return view('welcome');
 // });
