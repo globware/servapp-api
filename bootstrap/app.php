@@ -21,21 +21,32 @@ return Application::configure(basePath: dirname(__DIR__))
             |--------------------------------------------------------------------------
             */
             // if (in_array($host, config('app.api_domains'))) {
-            if($host == config('app.api_domain')) {
-                Route::middleware('api')
-                    ->prefix('v1') // optional but recommended
-                    ->group(base_path('routes/api.php'));
+            // if($host == config('app.api_domain')) {
+            //     Route::middleware('api')
+            //         ->prefix('v1') // optional but recommended
+            //         ->group(base_path('routes/api.php'));
 
-                return;
-            }
+            //     return;
+            // }
+            // Load API routes with domain constraint
+            Route::middleware('api')
+                ->prefix('v1')
+                ->domain(config('app.api_domain'))
+                ->group(base_path('routes/api.php'));
 
             /*
             |--------------------------------------------------------------------------
             | WEB / ADMIN / MAIN DOMAIN → load web routes only
             |--------------------------------------------------------------------------
             */
-            Route::middleware('web')
-                ->group(base_path('routes/web.php'));
+            // Route::middleware('web')
+            //     ->group(base_path('routes/web.php'));
+            
+            // Load web routes only on non-API domains
+            if($host != config('app.api_domain')) {
+                Route::middleware('web')
+                    ->group(base_path('routes/web.php'));
+            }
         },
         commands: __DIR__.'/../routes/console.php',
         health: '/up',

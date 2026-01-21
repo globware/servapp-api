@@ -9,12 +9,9 @@ use App\Http\Controllers\GoogleController;
 
 use App\Http\Controllers\UtilityController;
 
-Route::domain(config('app.api_domain'))->group(function () {
+// Route::domain(config('app.api_domain'))->group(function () {
     Route::group(['prefix' => '/auth'], function () {
-        // Route::post('/login', [AuthController::class, "login"]);
-        Route::post('/login', function() {
-            dd('this here');
-        });
+        Route::post('/login', [AuthController::class, "login"]);
         Route::post('/refresh_token', [AuthController::class, "refreshToken"]);
         Route::post('/send_email_verification_mail', [AuthController::class, "sendVerificationMail"]);
         Route::post('/verify_email_token', [AuthController::class, "verifyEmailToken"]);
@@ -33,4 +30,4 @@ Route::domain(config('app.api_domain'))->group(function () {
 
     require __DIR__ . '/api/users.php';
     require __DIR__ . '/api/providers.php';
-});
+// });
