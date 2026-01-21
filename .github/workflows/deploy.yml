@@ -1,0 +1,102 @@
+name: Deploy to Staging Server
+
+on:
+  push:
+    branches:
+      - main  # Change to your default branch if necessary
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install sshpass
+      run: sudo apt-get install -y sshpass
+
+    - name: Pull latest changes from GitHub
+      run: |
+        sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@104.207.66.141 << 'EOF'
+        cd /home/servapp/web/servappglobal.com/public_html
+        git pull https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/globware/servapp-api.git main
+
+        cd /home/servapp/web/api.servappglobal.com/public_html
+        git pull https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/globware/servapp-api.git main
+
+        cd /home/servapp/web/admin.servappglobal.com/public_html
+        git pull https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/globware/servapp-api.git main
+        EOF
+
+    - name: Run post-deployment scripts
+      run: |
+        # post-deployment for public domain
+        sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@104.207.66.141 << 'EOF'
+        cd /home/servapp/web/servappglobal.com/public_html
+
+        # Run migrations for the main database
+        php artisan migrate --force
+
+        # Run migrations for the tenants database
+        php artisan tenants:migrate --force
+
+        # Seed The data
+        php artisan db:seed --class=DatabaseSeeder
+
+        # Install Composer dependencies
+        composer install --no-dev --optimize-autoloader
+
+        # Clear various caches
+        php artisan route:clear
+        php artisan config:clear
+        php artisan cache:clear
+        php artisan view:clear
+
+
+        # post-deployment for api domain
+        cd /home/servapp/web/api.servappglobal.com/public_html
+
+        # Run migrations for the main database
+        php artisan migrate --force
+
+        # Run migrations for the tenants database
+        php artisan tenants:migrate --force
+
+        # Seed The data
+        php artisan db:seed --class=DatabaseSeeder
+
+        # Install Composer dependencies
+        composer install --no-dev --optimize-autoloader
+
+        # Clear various caches
+        php artisan route:clear
+        php artisan config:clear
+        php artisan cache:clear
+        php artisan view:clear
+
+
+
+        # post-deployment for admin domain
+        cd /home/servapp/web/admin.servappglobal.com/public_html
+
+        # Run migrations for the main database
+        php artisan migrate --force
+
+        # Run migrations for the tenants database
+        php artisan tenants:migrate --force
+
+        # Seed The data
+        php artisan db:seed --class=DatabaseSeeder
+
+        # Install Composer dependencies
+        composer install --no-dev --optimize-autoloader
+
+        # Clear various caches
+        php artisan route:clear
+        php artisan config:clear
+        php artisan cache:clear
+        php artisan view:clear
+        EOF
