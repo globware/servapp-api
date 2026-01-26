@@ -24,9 +24,9 @@ use App\Http\Controllers\UtilityController;
         Route::get("/states", [UtilityController::class, "states"]);
     });
 
-    Route::group(['prefix' => '/users'], function () {
-        // Route::post("", [UserController::class, "save"]);
-    });
+    // Route::group(['prefix' => '/users'], function () {
+    //     // Route::post("", [UserController::class, "save"]);
+    // });
 
     require __DIR__ . '/api/users.php';
     require __DIR__ . '/api/providers.php';
