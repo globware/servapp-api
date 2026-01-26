@@ -31,7 +31,7 @@ class Register extends BaseRequest
             "surname" => "required|string",
             "email" => "required|unique:users,email",
             "phoneNumber" => "required|string",
-            "locationId" => "required|integer|exists:locations,id",
+            "locationId" => "integer|exists:locations,id",
             "password" => "required|string|min:7|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/"
         ];
     }
