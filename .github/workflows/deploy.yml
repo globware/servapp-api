@@ -59,15 +59,6 @@ jobs:
         # post-deployment for api domain
         cd /home/servapp/web/api.servappglobal.com/public_html
 
-        # Run migrations for the main database
-        php artisan migrate --force
-
-        # Run migrations for the tenants database
-        php artisan tenants:migrate --force
-
-        # Seed The data
-        php artisan db:seed --class=DatabaseSeeder
-
         # Install Composer dependencies
         composer install --no-dev --optimize-autoloader
 
@@ -81,15 +72,6 @@ jobs:
 
         # post-deployment for admin domain
         cd /home/servapp/web/admin.servappglobal.com/public_html
-
-        # Run migrations for the main database
-        php artisan migrate --force
-
-        # Run migrations for the tenants database
-        php artisan tenants:migrate --force
-
-        # Seed The data
-        php artisan db:seed --class=DatabaseSeeder
 
         # Install Composer dependencies
         composer install --no-dev --optimize-autoloader

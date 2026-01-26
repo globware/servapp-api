@@ -25,7 +25,7 @@ use App\Http\Controllers\UtilityController;
     });
 
     Route::group(['prefix' => '/users'], function () {
-        Route::post("", [UserController::class, "save"]);
+        // Route::post("", [UserController::class, "save"]);
     });
 
     require __DIR__ . '/api/users.php';
