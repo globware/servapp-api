@@ -25,7 +25,7 @@ class AuthService
     public function login($credentials)
     {
         $userService = new UserService;
-        try {
+        // try {
             if (!$token = JWTAuth::attempt($credentials)) {
                 // return response()->json([
                 //     'error' => 'Invalid credentials'
@@ -45,10 +45,6 @@ class AuthService
             $userService->updateRefreshTokenData($user, $this->refreshToken, $this->device);
 
             return ["user" => $user, "tokenData" => $tokenData];
-
-        } catch (\Exception $e) {
-            throw new AppException(500, 'Could not login User', $e);
-        }
     }
 
     public function googleAuth($data)

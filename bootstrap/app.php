@@ -41,7 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
             */
             // Route::middleware('web')
             //     ->group(base_path('routes/web.php'));
-            
+
             // Load web routes only on non-API domains
             if($host != config('app.api_domain')) {
                 Route::middleware('web')
@@ -53,6 +53,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(RejectWebOnApi::class);
+
+        // Add redirect configuration for unauthenticated users
+        $middleware->redirectGuestsTo('/login');
         
         $middleware->alias([
             'UserAuth'    => UserAuth::class,

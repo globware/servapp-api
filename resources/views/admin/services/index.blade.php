@@ -15,15 +15,18 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Location
                         </th>
-                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Requests
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Verified
                         </th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Created
                         </th>
-                        {{-- <th scope="col" class="relative px-6 py-3">
-                            <span class="sr-only">Actions</span>
-                        </th> --}}
+                        <th scope="col" class="relative px-6 py-3">
+                            Actions
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -55,12 +58,29 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ $service->requests_count ?? 0 }}</div>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $service->verified ? 'Yes' : 'No' }}</div>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $service->created_at->format('M d, Y') }}
                             </td>
-                            {{-- <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="#" class="text-indigo-600 hover:text-indigo-900">View</a>
-                            </td> --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-center justify-center" id="verify-cell-{{ $service->id }}">
+                                @if($service->verified)
+                                    <span class="text-green-600">Verified</span>
+                                @else
+                                    <button 
+                                        onclick="verifyService(this, {{ $service->id }})" 
+                                        data-url="{{ route('admin.services.verify', $service->id) }}"
+                                        class=" text-indigo-600 px-2 py-1 hover:text-indigo-900 bg-green-50 border border-green-600 cursor-pointer font-bold">
+                                        Verify
+                                    </button>
+                                @endif
+
+                                <a href="{{ route('admin.services.show', $service->id) }}" 
+                                    class="text-indigo-600 px-2 py-1 hover:text-indigo-900 bg-green-50 rounded border border-green-600 cursor-pointer font-bold">
+                                    View
+                                </a>
+                            </td>
                         </tr>
                     @empty
                         <tr>
@@ -76,4 +96,32 @@
              {{ $services->links() }}
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function verifyService(button, serviceId) {
+            if (!confirm('Are you sure you want to verify this service?')) return;
+
+            const url = button.dataset.url;
+            const originalText = button.innerText;
+            
+            button.innerText = 'Verifying...';
+            button.disabled = true;
+
+            axios.patch(url)
+                .then(response => {
+                    if (response.data.success) {
+                        const cell = document.getElementById(`verify-cell-${serviceId}`);
+                        cell.innerHTML = '<span class="text-green-600">Verified</span>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying service:', error);
+                    alert('Failed to verify service.');
+                    button.innerText = originalText;
+                    button.disabled = false;
+                });
+        }
+    </script>
+    @endpush
 </x-admin-layout>

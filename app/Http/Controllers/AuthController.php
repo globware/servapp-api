@@ -110,8 +110,11 @@ class AuthController extends Controller
                 "tokenData" => $response['tokenData']
             ]);
 
-        } catch(AppException $e){
+        } catch (AppException $e) {
             throw $e;
+
+        } catch (\Exception $e) {
+            throw new AppException(500, 'Could not login User', $e);
         }
     }
 

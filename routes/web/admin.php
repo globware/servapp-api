@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ServiceController;
 
 Route::middleware('guest:web')->group(function () {
     Route::get('login', [AuthController::class, 'login'])->name('admin.login');
@@ -21,5 +22,7 @@ Route::middleware('auth:web')->group(function () {
 
     Route::group(['prefix' => '/services'], function () {
         Route::get('', [DashboardController::class, 'services'])->name('admin.services.index');
+        Route::get('{serviceId}', [ServiceController::class, 'show'])->name('admin.services.show');
+        Route::patch('{serviceId}/verify', [DashboardController::class, 'verifyService'])->name('admin.services.verify');
     });
 });

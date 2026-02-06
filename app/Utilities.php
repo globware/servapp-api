@@ -27,6 +27,11 @@ class Utilities
         if ($e instanceof AppException && $e->getStatusCode() == 402) {
             return self::error402($e->getMessage());
         }
+
+        // For AppException with 402 status, use the specific method
+        if ($e instanceof AppException && $e->getStatusCode() == 401) {
+            return self::error401($e->getMessage());
+        }
         
         $finalMessage = ($message != '') ? $message : 'An error occurred while trying to perform this operation, Please try again later or contact support';
         

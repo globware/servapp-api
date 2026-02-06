@@ -30,4 +30,16 @@ class DashboardController extends Controller
         $services = UserService::with(['user', 'country', 'state'])->latest()->paginate(10);
         return view('admin.services.index', compact('services'));
     }
+
+    public function verifyService($id)
+    {
+        $service = UserService::findOrFail($id);
+        $service->verified = true;
+        $service->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Service verified successfully.'
+        ]);
+    }
 }
