@@ -66,6 +66,18 @@ class Utilities
         ], 401);
     }
 
+    /**
+     * Handle 400
+     */
+    public static function error400(string $message): JsonResponse
+    {
+        return response()->json([
+            'statusCode' => 400,
+            'message' => $message,
+            'error' => $message
+        ], 400);
+    }
+
     public static function logStuff($message)
     {
         Log::stack(['project'])->info($message);

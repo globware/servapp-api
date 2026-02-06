@@ -27,6 +27,9 @@ class AppException extends Exception
         }elseif($statusCode == 401) {
             parent::__construct($message);
             $this->exception = $this;
+        }elseif($statusCode == 400) {
+            parent::__construct($message);
+            $this->exception = $this;
         }else{
             $this->exception = ($e) ? $e : $this;
         }

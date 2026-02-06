@@ -30,7 +30,7 @@ class AuthService
                 // return response()->json([
                 //     'error' => 'Invalid credentials'
                 // ], 401);
-                throw new AppException(401, 'Invalid Credentials');
+                throw new AppException(400, 'Invalid Credentials');
             }
             
             $user = Auth::user();
