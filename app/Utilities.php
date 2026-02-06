@@ -35,7 +35,7 @@ class Utilities
 
         // For AppException with 400 status, use the specific method
         if ($e instanceof AppException && $e->getStatusCode() == 400) {
-            return self::error401($e->getMessage());
+            return self::error400($e->getMessage());
         }
         
         $finalMessage = ($message != '') ? $message : 'An error occurred while trying to perform this operation, Please try again later or contact support';
