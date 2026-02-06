@@ -28,8 +28,13 @@ class Utilities
             return self::error402($e->getMessage());
         }
 
-        // For AppException with 402 status, use the specific method
+        // For AppException with 401 status, use the specific method
         if ($e instanceof AppException && $e->getStatusCode() == 401) {
+            return self::error401($e->getMessage());
+        }
+
+        // For AppException with 400 status, use the specific method
+        if ($e instanceof AppException && $e->getStatusCode() == 400) {
             return self::error401($e->getMessage());
         }
         
