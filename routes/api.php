@@ -10,7 +10,7 @@ use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\UtilityController;
 
 Route::domain(config('app.api_domain'))->group(function () {
-    dd('api route');
+    dd('api route '.config('app.api_domain'));
     Route::group(['prefix' => '/auth'], function () {
         Route::post('/login', [AuthController::class, "login"]);
         Route::post('/refresh_token', [AuthController::class, "refreshToken"]);
