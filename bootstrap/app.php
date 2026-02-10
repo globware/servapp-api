@@ -11,9 +11,11 @@ use App\Http\Middleware\RejectWebOnApi;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        using: function () {
+        web: base_path('routes/web.php'),
+        api: base_path('routes/api.php'),
+        // using: function () {
 
-            $host = request()->getHost();
+            // $host = request()->getHost();
 
             /*
             |--------------------------------------------------------------------------
@@ -29,10 +31,11 @@ return Application::configure(basePath: dirname(__DIR__))
             //     return;
             // }
             // Load API routes with domain constraint
-            Route::middleware('api')
-                ->prefix('v1')
-                ->domain(config('app.api_domain'))
-                ->group(base_path('routes/api.php'));
+
+            // Route::middleware('api')
+            //     ->prefix('v1')
+            //     ->domain(config('app.api_domain'))
+            //     ->group(base_path('routes/api.php'));
 
             /*
             |--------------------------------------------------------------------------
@@ -43,11 +46,12 @@ return Application::configure(basePath: dirname(__DIR__))
             //     ->group(base_path('routes/web.php'));
 
             // Load web routes only on non-API domains
-            if($host != config('app.api_domain')) {
-                Route::middleware('web')
-                    ->group(base_path('routes/web.php'));
-            }
-        },
+
+            // if($host != config('app.api_domain')) {
+            //     Route::middleware('web')
+            //         ->group(base_path('routes/web.php'));
+            // }
+        // },
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
