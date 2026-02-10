@@ -45,11 +45,9 @@ class AuthController extends Controller
 
             $emailToken = $this->emailService->saveEmailVerificationToken($request->email);
 
-            // remember to delete this later
-            $user->email_verification_token = $emailToken;
-            $user->update();
-
+            Utilities::logStuff("sending mail");
             $mail = Mail::to($request->email)->send(new EmailVerification($emailToken));
+            Utilities::logStuff("done sending mail");
             // if (Mail::failures()) {
             //     return response()->json(['status' => 'fail', 'message' => 'Failed to send email.']);
             // }

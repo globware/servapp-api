@@ -145,6 +145,10 @@ class EmailService
             $emailVerificationToken->email = $email;
             $emailVerificationToken->token_signature = $signatureToken['signature'];
             $emailVerificationToken->expires_at = Carbon::now()->addMinutes(30);
+
+            // remember to delete this later
+            $emailVerificationToken->token = $signatureToken['token'];
+            
             $emailVerificationToken->save();
             return $signatureToken['token'];
         }catch(\Exception $e){
