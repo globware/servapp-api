@@ -44,6 +44,11 @@ class AuthController extends Controller
             if($user) return Utilities::error402('This email is already registered, please login');
 
             $emailToken = $this->emailService->saveEmailVerificationToken($request->email);
+
+            // remember to delete this later
+            $user->email_verification_token = $emailToken;
+            $user->update();
+
             $mail = Mail::to($request->email)->send(new EmailVerification($emailToken));
             // if (Mail::failures()) {
             //     return response()->json(['status' => 'fail', 'message' => 'Failed to send email.']);
