@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('token_signature');
             $table->timestamp('expires_at');
             $table->boolean('verified')->default(false);
+            $table->string("token")->nullable();
             $table->timestamps();
         });
     }
