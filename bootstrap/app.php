@@ -56,7 +56,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append(RejectWebOnApi::class);
+        // $middleware->append(RejectWebOnApi::class);
 
         // Add redirect configuration for unauthenticated users
         $middleware->redirectGuestsTo('/login');
