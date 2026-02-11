@@ -31,10 +31,13 @@ class RejectWebOnApi
         }
 
         // Block non-versioned API routes on API domain
-        if ($request->getHost() === config('app.api_domain') &&
-            ! preg_match('#^v\d+/#', $path)) {
+        if ($request->getHost() === config('app.api_domain')) {
             abort(404);
         }
+        // if ($request->getHost() === config('app.api_domain') &&
+        //     ! preg_match('#^v\d+/#', $path)) {
+        //     abort(404);
+        // }
         // if ($request->getHost() === config('app.api_domain') &&
         //     ! preg_match('#^v\d+/#', ltrim($request->path(), '/'))) {
         //         dd($request->getHost().' === '.config('app.api_domain'). ' and '. $request->path(). ' = ' . ! preg_match('#^v\d+/#', ltrim($request->path(), '/')));
