@@ -20,6 +20,15 @@ Route::domain(config('app.api_domain'))->group(function () {
             'host' => $request->getHost(),
             'scheme' => $request->getScheme(),
         ]);
+        return $next($request);
+    })->group(function () {
+        
+        Route::group(['prefix' => '/auth'], function () {
+            Route::post('/login', [AuthController::class, "login"]);
+            Route::post('/refresh_token', [AuthController::class, "refreshToken"]);
+            // ... rest of routes
+        });
+        
     });
 
     Route::group(['prefix' => '/auth'], function () {
