@@ -11,7 +11,7 @@ use App\Http\Controllers\UtilityController;
 
 use App\Http\Middleware\LogRequestUrl;
 
-Route::domain(config('app.api_domain'))->middleware(LogRequestUrl::class)->group(function () {
+Route::domain(config('app.api_domain'))->group(function () {
     // dd('api route '.config('app.api_domain'));
     
 
