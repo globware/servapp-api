@@ -11,6 +11,17 @@ use App\Http\Controllers\UtilityController;
 
 Route::domain(config('app.api_domain'))->group(function () {
     // dd('api route '.config('app.api_domain'));
+    Route::middleware(function ($request, $next) {
+        dd([
+            'full_url' => $request->fullUrl(),
+            'url' => $request->url(),
+            'path' => $request->path(),
+            'method' => $request->method(),
+            'host' => $request->getHost(),
+            'scheme' => $request->getScheme(),
+        ]);
+    });
+
     Route::group(['prefix' => '/auth'], function () {
         Route::post('/login', [AuthController::class, "login"]);
         Route::post('/refresh_token', [AuthController::class, "refreshToken"]);
