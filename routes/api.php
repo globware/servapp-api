@@ -24,6 +24,10 @@ Route::domain(config('app.api_domain'))->group(function () {
 
         Route::post('/google', [GoogleController::class, 'loginOrRegister']);
     });
+    Route::group(['middleware' => 'UserAuth', 'prefix' => '/auth'], function () {
+        Route::post('/send_email_verification_mail', [AuthController::class, "sendVerificationMail"]);
+        Route::post('/verify_email_token', [AuthController::class, "verifyEmailToken"]);
+    });
 
     Route::group(['prefix' => '/utilities'], function () {
         Route::get("/states", [UtilityController::class, "states"]);

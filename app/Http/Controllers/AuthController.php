@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 use App\Exceptions\AppException;
 
 use App\Http\Requests\Login;
@@ -37,17 +38,17 @@ class AuthController extends Controller
     }
     
     //Send email verification before registration
-    public function sendVerificationMail(VerifyEmail $request)
+    public function sendVerificationMail(Request $request)
     {
         try{
-            $user = $this->userService->getByEmail($request->email);
-            if($user) return Utilities::error402('This email is already registered, please login');
+            $user = Auth::user();
 
-            $emailToken = $this->emailService->saveEmailVerificationToken($request->email);
+            $emailToken = $this->emailService->saveEmailVerificationToken($user->email);
 
-            Utilities::logStuff("sending mail");
+            // Utilities::logStuff("sending mail");
             $mail = Mail::to($request->email)->send(new EmailVerification($emailToken));
-            Utilities::logStuff("done sending mail");
+            // Utilities::logStuff("done sending mail");
+
             // if (Mail::failures()) {
             //     return response()->json(['status' => 'fail', 'message' => 'Failed to send email.']);
             // }
@@ -83,7 +84,7 @@ class AuthController extends Controller
         try{
             $data = $request->validated();
 
-            if(!$this->emailService->emailVerified($data['email'])) return Utilities::error402("Email has not been verified");
+            // if(!$this->emailService->emailVerified($data['email'])) return Utilities::error402("Email has not been verified");
 
             $user = $this->userService->save($data);
 

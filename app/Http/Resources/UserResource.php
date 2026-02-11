@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             "surname" => $this->surname,
             "email" => $this->email,
             "phoneNumber" => $this->phone_number,
+            "emailVerified" => ($this->email_verified_at) ? true : false,
             "emailVerifiedAt" => $this->email_verified_at,
             "photo" => new FileResource($this->photo),
             "tokens" => $this->tokens,
