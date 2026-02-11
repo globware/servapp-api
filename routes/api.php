@@ -9,27 +9,11 @@ use App\Http\Controllers\GoogleController;
 
 use App\Http\Controllers\UtilityController;
 
-Route::domain(config('app.api_domain'))->group(function () {
+use App\Http\Middleware\LogRequestUrl;
+
+Route::domain(config('app.api_domain'))->middleware(LogRequestUrl::class)->group(function () {
     // dd('api route '.config('app.api_domain'));
-    Route::middleware(function ($request, $next) {
-        dd([
-            'full_url' => $request->fullUrl(),
-            'url' => $request->url(),
-            'path' => $request->path(),
-            'method' => $request->method(),
-            'host' => $request->getHost(),
-            'scheme' => $request->getScheme(),
-        ]);
-        return $next($request);
-    })->group(function () {
-        
-        Route::group(['prefix' => '/auth'], function () {
-            Route::post('/login', [AuthController::class, "login"]);
-            Route::post('/refresh_token', [AuthController::class, "refreshToken"]);
-            // ... rest of routes
-        });
-        
-    });
+    
 
     Route::group(['prefix' => '/auth'], function () {
         Route::post('/login', [AuthController::class, "login"]);
