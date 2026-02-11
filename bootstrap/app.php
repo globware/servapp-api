@@ -11,15 +11,19 @@ use App\Http\Middleware\RejectWebOnApi;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        // API domain routes
-        Route::middleware('api')
-            ->domain(env('API_DOMAIN'))
-            ->group(base_path('routes/api.php'));
+        // web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+        then: function (): void {
+            // API domain routes
+            Route::middleware('api')
+                ->domain(env('API_DOMAIN'))
+                ->group(base_path('routes/api.php'));
 
-        // Web/Admin routes
-        Route::middleware('web')
-            ->group(base_path('routes/web.php'));
-        // using: function () {
+            // Web/Admin routes
+            Route::middleware('web')
+                ->group(base_path('routes/web.php'));
+        },
 
             // $host = request()->getHost();
 
@@ -57,9 +61,6 @@ return Application::configure(basePath: dirname(__DIR__))
             //     Route::middleware('web')
             //         ->group(base_path('routes/web.php'));
             // }
-        // },
-        commands: __DIR__.'/../routes/console.php',
-        health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // $middleware->append(RejectWebOnApi::class);

@@ -1,0 +1,67 @@
+server {
+        listen      104.207.66.141:80;
+        server_name api.servappglobal.com ;
+        error_log   /var/log/apache2/domains/api.servappglobal.com.error.log error;
+
+        include /home/servapp/conf/web/api.servappglobal.com/nginx.forcessl.conf*;
+
+        location ~ /\.(?!well-known\/|file) {
+                deny all;
+                return 404;
+        }
+
+        location / {
+                proxy_pass http://104.207.66.141:8080;
+
+                location ~* ^.+\.(css|htm|html|js|mjs|json|xml|apng|avif|bmp|cur|gif|ico|jfif|jpg|jpeg|pjp|pjpeg|png|svg|tif|tiff|webp|aac|caf|flac|m4a|midi|mp3|ogg|opus|wa>
+                        try_files  $uri @fallback;
+
+                        root       /home/servapp/web/api.servappglobal.com/public_html/public;
+                        access_log /var/log/apache2/domains/api.servappglobal.com.log combined;
+                        access_log /var/log/apache2/domains/api.servappglobal.com.bytes bytes;
+
+                        expires    max;
+                }
+        }
+
+        location @fallback {
+                proxy_pass http://104.207.66.141:8080;
+        }
+
+        location /error/ {
+                alias /home/servapp/web/api.servappglobal.com/document_errors/;
+        }
+
+        include /home/servapp/conf/web/api.servappglobal.com/nginx.conf_*;
+}
+
+
+
+
+server {
+
+    # Serve static files directly
+    root /home/servapp/web/api.servappglobal.com/public_html/public;
+
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # PHP processing
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.3-fpm-api.servappglobal.com.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # Error pages
+    location /error/ {
+        alias /home/servapp/web/api.servappglobal.com/document_errors/;
+    }
+
+    # Include additional custom Hestia rules
+    include /home/servapp/conf/web/api.servappglobal.com/nginx.conf_*;
+}
