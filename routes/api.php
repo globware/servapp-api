@@ -12,7 +12,7 @@ use App\Http\Controllers\UtilityController;
 use App\Http\Middleware\LogRequestUrl;
 
 Route::domain(config('app.api_domain'))->middleware(LogRequestUrl::class)->group(function () {
-    // dd('api route '.config('app.api_domain'));
+    dd('api route '.config('app.api_domain'));
     
 
     Route::group(['prefix' => '/auth'], function () {
