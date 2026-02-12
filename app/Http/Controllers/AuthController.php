@@ -88,6 +88,14 @@ class AuthController extends Controller
 
             $user = $this->userService->save($data);
 
+            try{
+                $emailToken = $this->emailService->saveEmailVerificationToken($user->email);
+
+                $mail = Mail::to($request->email)->send(new EmailVerification($emailToken));
+            }catch(\Exception $e) {
+                Utilities::error($e, "An Error occurred trying to send verification mail during registration");
+            }
+
             $response = $this->authService->loginUser($user);
 
             return Utilities::ok([
