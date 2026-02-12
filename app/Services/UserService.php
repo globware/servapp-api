@@ -21,7 +21,7 @@ class UserService
             if(!$fromGoogle) {
                 $emailVerified = $emailService->emailVerified($data['email']);
 
-                if(!$emailVerified) throw new AppException(402, "This Email has not been verified!");
+                // if(!$emailVerified) throw new AppException(402, "This Email has not been verified!");
             }
 
             $user = new User;
