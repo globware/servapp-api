@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use APp\Http\Requests\BaseRequest;
+use App\Http\Requests\BaseRequest;
 
 class ValidateEmailToken extends BaseRequest
 {

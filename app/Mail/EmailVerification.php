@@ -30,7 +30,7 @@ class EmailVerification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address(env('MAIL_FROM_ADDRESS'), 'Adbond'),
+            from: new Address(env('MAIL_FROM_ADDRESS'), 'ServApp'),
             subject: 'Email Verification',
         );
     }

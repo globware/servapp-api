@@ -36,7 +36,7 @@ class UserService
             if(!$fromGoogle) $user->password = $data['password'];
             $user->referral_code = Utilities::generateReferalCode();
             if(isset($data['refererId'])) $user->referred_by = $data['refererId'];
-            $user->email_verified_at = now();
+            // $user->email_verified_at = now();
 
             $user->save();
 
