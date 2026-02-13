@@ -48,6 +48,13 @@ class UserService
         }
     }
 
+    public function emailVerified($user)
+    {
+        $user->email_verified_at = now();
+        $user->update();
+        return $user;
+    }
+
     public function update($data, $user)
     {
         try{

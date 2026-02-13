@@ -62,11 +62,14 @@ class AuthController extends Controller
     public function verifyEmailToken(ValidateEmailToken $request)
     {
         try{
+            $user = Auth::user();
             $data = $request->validated();
-            $emailToken = $this->emailService->emailExists($data['email']);
+            $data['email'] = $user->email;
+            $emailToken = $this->emailService->emailExists($user->email);
             if($emailToken && $emailToken->verified) return Utilities::error402("Your email has been verified already, Go ahead and login");
             $response = $this->emailService->validateEmailToken($data);
             if($response['success']) {
+                $user = $this->userService->emailVerified($user);
                 return Utilities::okay("Validation Successful");
             }else{
                 return response()->json([

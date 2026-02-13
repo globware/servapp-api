@@ -24,7 +24,7 @@ class ValidateEmailToken extends BaseRequest
     {
         return [
             "token" => "required",
-            "email" => "required|email"
+            // "email" => "required|email"
         ];
     }
 }
