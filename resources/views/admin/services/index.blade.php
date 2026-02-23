@@ -65,16 +65,18 @@
                                 {{ $service->created_at->format('M d, Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-center justify-center" id="verify-cell-{{ $service->id }}">
-                                @if($service->verified)
-                                    <span class="text-green-600">Verified</span>
-                                @else
-                                    <button 
-                                        onclick="verifyService(this, {{ $service->id }})" 
-                                        data-url="{{ route('admin.services.verify', $service->id) }}"
-                                        class=" text-indigo-600 px-2 py-1 hover:text-indigo-900 bg-green-50 border border-green-600 cursor-pointer font-bold">
-                                        Verify
-                                    </button>
-                                @endif
+                                <span id="verify-span-{{ $service->id }}">
+                                    @if($service->verified)
+                                        <span class="text-green-600">Verified</span>
+                                    @else
+                                        <button 
+                                            onclick="verifyService(this, '{{ $service->id }}')" 
+                                            data-url="{{ route('admin.services.verify', $service->id) }}"
+                                            class=" text-indigo-600 px-2 py-1 hover:text-indigo-900 bg-green-50 border border-green-600 cursor-pointer font-bold">
+                                            Verify
+                                        </button>
+                                    @endif
+                                </span>
 
                                 <a href="{{ route('admin.services.show', $service->id) }}" 
                                     class="text-indigo-600 px-2 py-1 hover:text-indigo-900 bg-green-50 rounded border border-green-600 cursor-pointer font-bold">
@@ -108,11 +110,13 @@
             button.innerText = 'Verifying...';
             button.disabled = true;
 
-            axios.patch(url)
+            axios.patch(url, {
+                _token: '{{ csrf_token() }}'
+            })
                 .then(response => {
-                    if (response.data.success) {
-                        const cell = document.getElementById(`verify-cell-${serviceId}`);
-                        cell.innerHTML = '<span class="text-green-600">Verified</span>';
+                    if (response.status === 200) {
+                        const span = document.getElementById(`verify-span-${serviceId}`);
+                        span.innerHTML = '<span class="text-green-600">Verified</span>';
                     }
                 })
                 .catch(error => {

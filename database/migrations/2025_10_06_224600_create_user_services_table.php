@@ -32,6 +32,7 @@ return new class extends Migration
             $table->string("longitude")->nullable();
             $table->string("latitude")->nullable();
             $table->text("description")->nullable();
+            $table->boolean("approved")->default(false);
             $table->boolean("verified")->default(false);
             $table->boolean("suspended")->default(false);
             $table->timestamps();

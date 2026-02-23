@@ -202,4 +202,30 @@ class UserServiceService
     {
         return UserService::topByRequests($count)->get();
     }
+
+    public function verify($id)
+    {
+        try{
+            $userService = $this->getService($id);
+            if(!$userService) throw new AppException(402, "This User Service does not exist");
+
+            $userService->verified = true;
+            $userService->approved = true;
+            $userService->update();
+            return $userService;
+        }catch(\Exception $e){
+            throw new AppException(500, "An Error Occurred while attempting to verify this service", $e);
+        }
+    }
+
+    // public function approve($id)
+    // {
+    //     try{
+    //         $userService = $this->getService($id);
+    //         if(!$userService) throw new AppException(402, "This User Service does not exist");
+
+    //         $userService->approve = true;
+    //         $userService->update();
+    //     }
+    // }
 }

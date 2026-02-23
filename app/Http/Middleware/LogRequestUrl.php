@@ -15,14 +15,14 @@ class LogRequestUrl
      */
     public function handle(Request $request, Closure $next): Response
     {
-        dd([
-            'full_url' => $request->fullUrl(),
-            'url' => $request->url(),
-            'path' => $request->path(),
-            'method' => $request->method(),
-            'host' => $request->getHost(),
-            'scheme' => $request->getScheme(),
-        ]);
+        // dd([
+        //     'full_url' => $request->fullUrl(),
+        //     'url' => $request->url(),
+        //     'path' => $request->path(),
+        //     'method' => $request->method(),
+        //     'host' => $request->getHost(),
+        //     'scheme' => $request->getScheme(),
+        // ]);
         return $next($request);
     }
 }

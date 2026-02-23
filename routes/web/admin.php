@@ -23,6 +23,7 @@ Route::middleware('auth:web')->group(function () {
     Route::group(['prefix' => '/services'], function () {
         Route::get('', [DashboardController::class, 'services'])->name('admin.services.index');
         Route::get('{serviceId}', [ServiceController::class, 'show'])->name('admin.services.show');
-        Route::patch('{serviceId}/verify', [DashboardController::class, 'verifyService'])->name('admin.services.verify');
+        Route::post('{serviceId}', [ServiceController::class, 'approve'])->name('admin.services.approve');
+        Route::patch('{serviceId}/verify', [ServiceController::class, 'verify'])->name('admin.services.verify');
     });
 });
