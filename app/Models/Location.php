@@ -9,21 +9,36 @@ class Location extends Model
 {
     use HasFactory;
     
-    public function scopeNear($query, $lat, $lng, $radius = 10)
+    public function scopeNear($query, $lat, $long, $radius = 10)
     {
-        return $query->selectRaw("
-            *, (
-                6371 * acos(
-                    cos(radians(?)) *
-                    cos(radians(latitude)) *
-                    cos(radians(longitude) - radians(?)) +
-                    sin(radians(?)) *
-                    sin(radians(latitude))
-                )
-            ) AS distance
-        ", [$lat, $lng, $lat])
-        ->having('distance', '<=', $radius)
-        ->orderBy('distance');
+        // return $query->selectRaw("
+        //     *, (
+        //         6371 * acos(
+        //             cos(radians(?)) *
+        //             cos(radians(latitude)) *
+        //             cos(radians(longitude) - radians(?)) +
+        //             sin(radians(?)) *
+        //             sin(radians(latitude))
+        //         )
+        //     ) AS distance
+        // ", [$lat, $lng, $lat])
+        // ->having('distance', '<=', $radius)
+        // ->orderBy('distance');
+
+            $haversine = "
+            (6371 * acos(
+                cos(radians(?)) *
+                cos(radians(latitude)) *
+                cos(radians(longitude) - radians(?)) +
+                sin(radians(?)) *
+                sin(radians(latitude))
+            ))
+        ";
+
+        return $query
+            ->selectRaw("*, $haversine AS distance", [$lat, $long, $lat])
+            ->whereRaw("$haversine <= ?", [$lat, $long, $lat, $radius])
+            ->orderBy("distance");
     }
 
     public function state()
