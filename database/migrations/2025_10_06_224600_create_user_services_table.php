@@ -29,8 +29,8 @@ return new class extends Migration
             $table->foreignId("state_id")->nullable();
             $table->foreignId("location_id")->nullable();
             $table->string("address")->nullable();
-            $table->string("longitude")->nullable();
-            $table->string("latitude")->nullable();
+            $table->double("longitude")->nullable();
+            $table->double("latitude")->nullable();
             $table->text("description")->nullable();
             $table->boolean("approved")->default(false);
             $table->boolean("verified")->default(false);
