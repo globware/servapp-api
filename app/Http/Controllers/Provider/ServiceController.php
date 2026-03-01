@@ -63,7 +63,7 @@ class ServiceController extends Controller
     {
         $this->service->userId = Auth::user()->id;
         $this->service->count = ['requests'];
-        $services = $this->service->getServices(['media', 'tags', 'reviews']);
+        $services = $this->service->getServices(['media', 'tags', 'reviews', 'service']);
         
         return Utilities::ok(UserServiceResource::collection($services));
     }
