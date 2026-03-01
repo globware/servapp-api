@@ -13,7 +13,7 @@ class State extends Model
     
     public function country()
     {
-        return $this->belongsTo(COuntry::class);
+        return $this->belongsTo(Country::class);
     }
 
     public function userServices()
