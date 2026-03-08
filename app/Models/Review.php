@@ -33,7 +33,7 @@ class Review extends Model
     {
         parent::boot();
 
-        static::deleting(function (ServiceReview $review) {
+        static::deleting(function (Review $review) {
             //
         });
     }

@@ -39,7 +39,7 @@ class UserServiceRequest extends Model
     {
         parent::boot();
 
-        static::deleting(function (ServiceRating $rating) {
+        static::deleting(function (UserServiceRequest $request) {
             //
         });
     }

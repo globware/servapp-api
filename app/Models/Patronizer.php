@@ -32,7 +32,7 @@ class Patronizer extends Model
     {
         parent::boot();
 
-        static::deleting(function (ServicePatronizer $patronizer) {
+        static::deleting(function (Patronizer $patronizer) {
             //
         });
     }

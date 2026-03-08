@@ -176,6 +176,16 @@ class UserService extends Model
         return $this->hasMany(UserServiceTag::class);
     }
 
+    public function complaints()
+    {
+        return $this->morphMany(Complaint::class, "target");
+    }
+
+    public function openComplaints()
+    {
+        return $this->complaints->where("closed", false);
+    }
+
     protected static function booted()
     {
         parent::boot();

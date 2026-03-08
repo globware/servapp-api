@@ -218,6 +218,21 @@ class UserServiceService
         }
     }
 
+    public function toggleActivate($id)
+    {
+        try{
+            $userService = $this->getService($id);
+            if(!$userService) throw new AppException(402, "This User Service does not exist");
+
+            $userService->active = !$userService->active;
+            $userService->update();
+            return $userService;
+        }catch(\Exception $e){
+            $action = ($userService->active) ? "activate" : "deactivate";
+            throw new AppException(500, "An Error Occurred while attempting to ".$action." this service", $e);
+        }
+    }
+
     // public function approve($id)
     // {
     //     try{
@@ -228,4 +243,15 @@ class UserServiceService
     //         $userService->update();
     //     }
     // }
+
+    public function delete($userService)
+    {
+        try{
+            if($userService->openComplaints()->count() > 0) throw new AppException(402, "sorry, you cannot delete this service at the moment");
+
+            $userService->delete();
+        }catch(\Exception $e){
+            throw new AppException(500, "An Error Occurred while attempting to verify this service", $e);
+        }
+    }
 }

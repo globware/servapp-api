@@ -32,7 +32,7 @@ class Rating extends Model
     {
         parent::boot();
 
-        static::deleting(function (ServiceRating $rating) {
+        static::deleting(function (Rating $rating) {
             //
         });
     }

@@ -26,6 +26,7 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
         Route::delete("/remove_tag/{serviceId}/{tagId}", [ServiceController::class, "removeTag"])->middleware('NumericParam:serviceId,tagId');
     
         Route::group(['prefix' => '/{serviceId}'], function () {
+            Route::delete("", [ServiceController::class, "delete"])->middleware('NumericParam:serviceId');
             Route::post("", [ServiceController::class, "update"])->middleware('NumericParam:serviceId');
             Route::get("", [ServiceController::class, "service"])->middleware('NumericParam:serviceId');
 

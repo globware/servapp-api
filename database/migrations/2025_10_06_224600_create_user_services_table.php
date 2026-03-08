@@ -35,6 +35,7 @@ return new class extends Migration
             $table->boolean("approved")->default(false);
             $table->boolean("verified")->default(false);
             $table->boolean("suspended")->default(false);
+            $table->boolean("active")->default(true);
             $table->timestamps();
         });
     }

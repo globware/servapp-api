@@ -184,4 +184,19 @@ class ServiceController extends Controller
         }
     }
 
+    public function delete($id)
+    {
+        try{
+            $service = $this->service->getService($id);
+            if(!$service) return Utilities::error402("This User Service does not exist");
+
+            if($service->user_id != Auth::user()->id) return Utilities::error402("You cannot delete a service that does not belong to you");
+            $this->service->delete($service);
+
+            return Utilities::okay("Service deleted Successfully");
+        } catch(\Exception $e) {
+            throw $e;
+        }
+    }
+
 }
