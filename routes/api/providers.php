@@ -23,6 +23,7 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
         Route::delete("/media/{mediaId}", [ServiceController::class, "deleteMedia"])->middleware('NumericParam:mediaId');
         Route::patch("/add_media/{serviceId}", [ServiceController::class, "addServiceMedia"])->middleware('NumericParam:serviceId');
         Route::patch("/add_tag/{serviceId}", [ServiceController::class, "addServiceTags"])->middleware('NumericParam:serviceId');
+        Route::patch("/toggle_activate/{serviceId}", [ServiceController::class, "toggleActivate"])->middleware('NumericParam:serviceId');
         Route::delete("/remove_tag/{serviceId}/{tagId}", [ServiceController::class, "removeTag"])->middleware('NumericParam:serviceId,tagId');
     
         Route::group(['prefix' => '/{serviceId}'], function () {

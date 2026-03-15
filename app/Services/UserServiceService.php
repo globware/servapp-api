@@ -228,8 +228,12 @@ class UserServiceService
             $userService->update();
             return $userService;
         }catch(\Exception $e){
-            $action = ($userService->active) ? "activate" : "deactivate";
-            throw new AppException(500, "An Error Occurred while attempting to ".$action." this service", $e);
+            if($userService) {
+                $action = ($userService->active) ? "activate" : "deactivate";
+                throw new AppException(500, "An Error Occurred while attempting to ".$action." this service", $e);
+            }else{
+                throw new AppException(500, "An Error Occurred while attempting to toggle this service active status", $e);
+            }
         }
     }
 
