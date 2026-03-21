@@ -91,7 +91,7 @@ class ServiceController extends Controller
 
     public function getService(Request $request, $serviceId)
     {
-        $service = $this->serviceService->getService($serviceId, ['userServices']);
+        $service = $this->serviceService->getService($serviceId, ['userServices' => fn($query) => $query->where('approved', true)]);
         if(!$service) return Utilities::error402("Service not found");
 
         return Utilities::ok(new ServiceResource($service));

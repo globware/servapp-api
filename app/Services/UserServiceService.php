@@ -200,7 +200,7 @@ class UserServiceService
 
     public function getTopServices($count=null)
     {
-        return UserService::topByRequests($count)->get();
+        return UserService::topByRequests($count)->where()->where("approved", true)->get();
     }
 
     public function verify($id)
