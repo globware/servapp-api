@@ -35,7 +35,7 @@
             
             <div class="flex items-center space-x-3">
                 @if(!$service->approved)
-                    <button onclick="approveService('{{ $service->id }}')" 
+                    <button onclick="approveService(this)" 
                             data-url="{{ route('admin.services.approve', $service->id) }}"
                             class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-black font-medium rounded-lg hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-sm hover:shadow transition-all duration-200">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -637,7 +637,7 @@
             document.getElementById(`content-${tabName}`).classList.remove('hidden');
         }
 
-        function approveService(serviceId) {
+        function approveService(button) {
             if (!confirm('Are you sure you want to approve this service?')) return;
 
             const button = event.target;
