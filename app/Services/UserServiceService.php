@@ -200,7 +200,7 @@ class UserServiceService
 
     public function getTopServices($count=null)
     {
-        return UserService::topByRequests($count)->get();
+        return UserService::topByRequests($count)->where("approved", true)->get();
     }
 
     public function verify($id)
@@ -228,21 +228,27 @@ class UserServiceService
             $userService->update();
             return $userService;
         }catch(\Exception $e){
-            $action = ($userService->active) ? "activate" : "deactivate";
-            throw new AppException(500, "An Error Occurred while attempting to ".$action." this service", $e);
+            if($userService) {
+                $action = ($userService->active) ? "activate" : "deactivate";
+                throw new AppException(500, "An Error Occurred while attempting to ".$action." this service", $e);
+            }else{
+                throw new AppException(500, "An Error Occurred while attempting to toggle this service active status", $e);
+            }
         }
     }
 
-    // public function approve($id)
-    // {
-    //     try{
-    //         $userService = $this->getService($id);
-    //         if(!$userService) throw new AppException(402, "This User Service does not exist");
+    public function approve($id)
+    {
+        try{
+            $userService = $this->getService($id);
+            if(!$userService) throw new AppException(402, "This User Service does not exist");
 
-    //         $userService->approve = true;
-    //         $userService->update();
-    //     }
-    // }
+            $userService->approved = true;
+            $userService->update();
+        }catch(\Exception $e){
+            throw new AppException(500, "An Error Occurred while attempting to approve this service", $e);
+        }
+    }
 
     public function delete($userService)
     {

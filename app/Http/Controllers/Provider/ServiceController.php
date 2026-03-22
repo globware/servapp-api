@@ -184,6 +184,17 @@ class ServiceController extends Controller
         }
     }
 
+    public function toggleActivate(Request $request, $id)
+    {
+        try{
+            $service = $this->service->toggleActivate($id);
+
+            return Utilities::ok(new UserServiceResource($service));
+        } catch(\Exception $e) {
+            throw $e;
+        }
+    }
+
     public function delete($id)
     {
         try{

@@ -51,6 +51,18 @@ class ServiceController extends Controller
 
     public function approve($id)
     {
+        try{
+            $userService = $this->userServiceService->approve($id);
+            return Utilities::ok([
+                'success' => true,
+                'message' => 'Service approved successfully.'
+            ]);
+        }catch(\Exception $e){
+            if ($e instanceof AppException) {
+                throw $e;
+            }
 
+            return Utilities::error($e, 'An Error Occurred while attempting to verify this service');
+        }
     }
 }
