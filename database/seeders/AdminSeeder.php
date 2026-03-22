@@ -32,6 +32,7 @@ class AdminSeeder extends Seeder
                 $admin->surname = $adminData['surname'];
                 $admin->email = $adminData['email'];
                 $admin->password = 'password';
+                $admin->save();
             }
         }
         // if (Admin::count() === 0) {
