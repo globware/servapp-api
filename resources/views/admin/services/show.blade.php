@@ -640,7 +640,7 @@
         function approveService(button) {
             if (!confirm('Are you sure you want to approve this service?')) return;
 
-            const button = event.target;
+            // const button = event.target;
             const url = button.dataset.url;
             const originalHtml = button.innerHTML;
             
@@ -655,7 +655,8 @@
 
             axios.post(url)
                 .then(response => {
-                    if (response.data.success) {
+                    console.log("approve response: ",response);
+                    if (response.status == 200) {
                         window.location.reload();
                     }
                 })

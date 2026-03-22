@@ -243,7 +243,7 @@ class UserServiceService
             $userService = $this->getService($id);
             if(!$userService) throw new AppException(402, "This User Service does not exist");
 
-            $userService->approve = true;
+            $userService->approved = true;
             $userService->update();
         }catch(\Exception $e){
             throw new AppException(500, "An Error Occurred while attempting to approve this service", $e);
