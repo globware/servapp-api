@@ -237,16 +237,18 @@ class UserServiceService
         }
     }
 
-    // public function approve($id)
-    // {
-    //     try{
-    //         $userService = $this->getService($id);
-    //         if(!$userService) throw new AppException(402, "This User Service does not exist");
+    public function approve($id)
+    {
+        try{
+            $userService = $this->getService($id);
+            if(!$userService) throw new AppException(402, "This User Service does not exist");
 
-    //         $userService->approve = true;
-    //         $userService->update();
-    //     }
-    // }
+            $userService->approve = true;
+            $userService->update();
+        }catch(\Exception $e){
+            throw new AppException(500, "An Error Occurred while attempting to approve this service", $e);
+        }
+    }
 
     public function delete($userService)
     {
