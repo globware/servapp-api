@@ -70,13 +70,19 @@ class Users extends Seeder
         */
 
         foreach($users as $user) {
+            $email = strtolower($user['firstname'])."@gmail.com";
+            
+            if (DB::table('users')->where('email', $email)->exists()) {
+                continue;
+            }
+
             DB::beginTransaction();
             try{
                 $emailService = new EmailService;
                 $userService = new UserService;
                 $locationService = new LocationService;
 
-                $user['email'] = strtolower($user['firstname'])."@gmail.com";
+                $user['email'] = $email;
 
                 $emailService->saveEmailVerificationToken($user['email']);
                 $emailVerification = $emailService->emailExists($user['email']);

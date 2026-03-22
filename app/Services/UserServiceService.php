@@ -112,9 +112,9 @@ class UserServiceService
         }
 
         if(isset($data['long']) || isset($data['lat'])) {
-            if($userService->long != $data['long'] || $userService->lat != $data['lat']) $updated[] = 'GPS';
-            if(isset($data['long'])) $userService->long = $data['long'];
-            if(isset($data['lat'])) $userService->lat = $data['lat'];
+            if($userService->longitude != $data['long'] || $userService->latitude != $data['lat']) $updated[] = 'GPS';
+            if(isset($data['long'])) $userService->longitude = $data['long'];
+            if(isset($data['lat'])) $userService->latitude = $data['lat'];
         }
         
         if(isset($data['phoneNumbers'])) $userService->phone_numbers = explode(",", $data['phoneNumbers']);

@@ -130,13 +130,19 @@ class Providers extends Seeder
         ];
 
         foreach($providers as $provider) {
+            $email = strtolower($provider['firstname'])."@gmail.com";
+
+            if (DB::table('users')->where('email', $email)->exists()) {
+                continue;
+            }
+
             DB::beginTransaction();
             try{
                 $emailService = new EmailService;
                 $userService = new UserService;
                 $userServiceService = new UserServiceService;
 
-                $provider['email'] = strtolower($provider['firstname'])."@gmail.com";
+                $provider['email'] = $email;
 
                 $emailService->saveEmailVerificationToken($provider['email']);
                 $emailVerification = $emailService->emailExists($provider['email']);

@@ -16,12 +16,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-        $seeders = [
-            new Services,
-            new MoveLocationLongLat
-        ];
-
-        foreach($seeders as $seeder) $seeder->run();
+        $this->call([
+            Services::class,
+            AdminSeeder::class,
+            Users::class,
+            Providers::class,
+            MoveLocationLongLat::class,
+        ]);
     }
 }
