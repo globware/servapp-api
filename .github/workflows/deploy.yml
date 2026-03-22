@@ -76,6 +76,12 @@ jobs:
         # Install Composer dependencies
         composer install --no-dev --optimize-autoloader
 
+        # Run npm install
+        npm install
+
+        # Run npm build
+        npm run build
+
         # Clear various caches
         php artisan route:clear
         php artisan config:clear
