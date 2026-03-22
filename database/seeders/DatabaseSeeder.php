@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 
 use Database\Seeders\Services;
 use Database\Seeders\MoveLocationLongLat;
+use Database\Seeders\AdminSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,7 +20,8 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
         $seeders = [
             new Services,
-            new MoveLocationLongLat
+            new AdminSeeder
+            // new MoveLocationLongLat
         ];
 
         foreach($seeders as $seeder) $seeder->run();
