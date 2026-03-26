@@ -68,20 +68,27 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Topbar -->
-            <header class="flex items-center justify-between h-20 px-8 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40 sticky top-0">
-                <div class="flex items-center">
+            <header class="flex items-center justify-between h-24 px-8 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40 sticky top-0">
+                <div class="flex items-center min-w-0">
                     <button @click="sidebarOpen = !sidebarOpen" class="p-2 mr-4 text-gray-500 hover:bg-gray-100 rounded-lg focus:outline-none lg:hidden">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
-                    <div>
-                        <h2 class="text-xl font-extrabold text-[#0F172A] tracking-tight">@yield('header')</h2>
-                        <p class="text-xs text-gray-400 font-medium">Administration / @yield('header')</p>
+                    <div class="truncate">
+                        @if(trim($__env->yieldContent('breadcrumbs')))
+                            @yield('breadcrumbs')
+                        @else
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1.5 opacity-60">
+                                Administration / @yield('header')
+                            </p>
+                        @endif
+                        <h2 class="text-xl md:text-2xl font-black text-[#0F172A] tracking-tight truncate leading-none">@yield('header')</h2>
                     </div>
                 </div>
                 
-                <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-5">
+                    @yield('actions')
                     <!-- Notifications placeholder -->
                     <button class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

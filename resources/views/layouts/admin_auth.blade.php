@@ -35,9 +35,9 @@
             <div class="w-full lg:w-1/2 flex flex-col items-center p-8 sm:p-16 bg-gray-50 dark:bg-gray-900 h-full overflow-y-auto">
                 <div class="w-full max-w-md my-auto space-y-8">
                     <div class="text-center">
-                        <a href="/" class="inline-block transition-transform hover:scale-105 duration-300">
+                        {{-- <a href="/" class="inline-block transition-transform hover:scale-105 duration-300">
                             <img src="{{ asset('logo.jpeg') }}" alt="ServeApp Logo" class="h-20 w-auto mx-auto drop-shadow-md">
-                        </a>
+                        </a> --}}
                         <h1 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Admin Portal</h1>
                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                             Welcome back! Please enter your credentials.
