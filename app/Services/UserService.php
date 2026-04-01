@@ -104,5 +104,12 @@ class UserService
         return User::where("provider_id", $providerId)->first();
     }
 
+    public function saveFCMToken($user, $token)
+    {
+        $user->fcmTokens()->updateOrCreate(
+            ['token' => $token],
+            ['token' => $token]
+        );
+    }
     
 }

@@ -123,6 +123,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Ticket::class);
     }
 
+    public function fcmTokens()
+    {
+        return $this->hasMany(FcmToken::class);
+    }
+
     public function complaints()
     {
         return $this->hasMany(Complaint::class, "complainer_id", "id");

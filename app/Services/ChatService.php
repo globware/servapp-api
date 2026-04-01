@@ -4,9 +4,12 @@ namespace App\Services;
 
 use App\Exceptions\AppException;
 
+use Kreait\Firebase\Messaging\CloudMessage;
+
 use App\Models\Chat;
 use App\Models\User;
 use App\Models\UserService;
+use App\Services\FcmService;
 
 use App\Services\ServiceRequestService;
 
@@ -44,11 +47,52 @@ class ChatService
             
             $chat->save();
 
+            $user = null;
+            if($data['entityType'] == User::$type) {
+                $user = $data['request']->userService->user;
+                $data['senderId'] = $data['entityId'];
+            }else{
+                $user = $data['request']->user;
+                $data['senderId'] = $data['request']->userService->user->id;
+            }
+
+            $fcmService = new FcmService;
+
+            if($user) $fcmService->send($user, $data['message'], $data['request']->id);
+            
+            $topic = 'service-request-'.$data['request']->id;
+            $fcmService->publish($topic, $data['message'], $data['request']->id);
+
+            // if($user) $this->sendFcmMessage($user, $data['request']->id, $data['message']);
+
             return $chat;
         }catch(\Exception $e){
             // $errorCode = AppException::getDefaultErrorCode(402);
             throw new AppException(500, null, $e);
         }
+    }
+
+    public function sendFcmMessage($user, $requestId, $message)
+    {
+        $tokens = $user->fcmTokens()
+        ->pluck('token')
+        ->toArray();
+
+        // Send FCM push
+        if (!empty($tokens)) {
+            $messaging = app('firebase.messaging');
+
+            $fcmMessage = CloudMessage::new()->withData([
+                'type' => 'chat_message',
+                'chat_id' => (string) $requestId,
+                // 'sender_id' => (string) auth()->id(),
+                'message' => $message,
+                'created_at' => now()->toDateTimeString(),
+            ]);
+
+            $messaging->sendMulticast($fcmMessage, $tokens);
+        }
+
     }
 
     public function markAsSeen($requestId, $entityId, $entityType)
