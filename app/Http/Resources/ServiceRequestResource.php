@@ -43,6 +43,7 @@ class ServiceRequestResource extends JsonResource
     {
         $resource = [
             "id" => $this->id,
+            "status" => $this->status,
             "message" => $this->message,
             "seen" => $this->seen,
             "user" => new UserResource($this->whenLoaded('user')),

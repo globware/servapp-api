@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_service_requests', function (Blueprint $table) {
-            $table->string("status", ServiceRequestStatus::PENDING->value);
+            $table->string("status")->default(ServiceRequestStatus::PENDING->value);
         });
     }
 
