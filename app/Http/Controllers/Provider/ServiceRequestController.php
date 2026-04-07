@@ -46,6 +46,24 @@ class ServiceRequestController extends Controller
         }
     }
 
+    public function accept($requestId)
+    {
+        try{
+            $this->requestService->accept($requestId);
+
+            return Utilities::okay("Request Accepted Successfully");
+        } catch(\Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function getRequests()
+    {
+        $requests = $this->requestService->getProviderRequests(Auth::user()->id, ['userService']);
+
+        return Utilities::ok(ServiceRequestResource::collection($requests));
+    }
+
     public function sendMessage(SendChatMessage $request)
     {
         try{

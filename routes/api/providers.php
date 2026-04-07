@@ -13,9 +13,11 @@ use App\Http\Controllers\UtilityController;
 Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' => 'Provider',], function () {
     Route::group(['prefix' => '/services'], function () {
         Route::group(['prefix' => '/requests'], function () {
-            Route::get("/{requestId}", [ServiceRequestController::class, "getRequest"])->middleware('NumericParam:requestId');
+            Route::get("", [ServiceRequestController::class, "getRequests"]);
             Route::post("/send_message", [ServiceRequestController::class, "sendMessage"]);
             Route::get("/chat_messages/{requestId}", [ServiceRequestController::class, "getRequestChats"])->middleware('NumericParam:requestId');
+            Route::post("/accept/{requestId}", [ServiceRequestController::class, "accept"])->middleware('NumericParam:requestId');
+            Route::get("/{requestId}", [ServiceRequestController::class, "getRequest"])->middleware('NumericParam:requestId');
         });
         Route::get("", [ServiceController::class, "services"]);
         Route::post("/add", [ServiceController::class, "save"]);

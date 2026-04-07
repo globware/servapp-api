@@ -59,6 +59,13 @@ class ServiceRequestController extends Controller
         }
     }
 
+    public function getRequests()
+    {
+        $requests = $this->requestService->getUserRequests(Auth::user()->id, ['userService']);
+
+        return Utilities::ok(ServiceRequestResource::collection($requests));
+    }
+
     public function sendMessage(SendChatMessage $request)
     {
         try{

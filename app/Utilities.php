@@ -88,6 +88,16 @@ class Utilities
         Log::stack(['project'])->info($message);
     }
 
+    public static function jobLog($message)
+    {
+        Log::stack(['job'])->info($message);
+    }
+
+    public static function workerLog($message)
+    {
+        Log::stack(['worker'])->info($message);
+    }
+
     public static function ok($data)
     {
         return response()->json([
@@ -105,6 +115,24 @@ class Utilities
             'data' => $data,
             'message' => $message
         ], 200);
+    }
+
+    public static function paginatedOk($data, $meta=[])
+    {
+        $responseData = ['statusCode' => 200];
+        if(!empty($data) || $data != '') $responseData['data'] = $data;
+        return response()->json([
+            'statusCode' => 200,
+            'data' => $data,
+            'meta' => $meta
+            // 'token' => Utilities::refreshToken($this->guard)
+        ], 200);
+        /*
+            current_page' => $paginated->currentPage(),
+        'per_page' => $paginated->perPage(),
+        'total' => $paginated->total(),
+        'last_page' => $paginated->lastPage(),
+        */
     }
 
     /**

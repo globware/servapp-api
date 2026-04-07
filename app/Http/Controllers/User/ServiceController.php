@@ -108,6 +108,24 @@ class ServiceController extends Controller
         return Utilities::ok(new UserServiceResource($userService, $requests));
     }
 
+    public function getUserServices(Request $request)
+    {
+        $this->userServiceService->paginated = true;
+        $this->userServiceService->page = (int) $request->query('page', 1);
+        $this->userServiceService->limit = (int) $request->query('perPage', env('PAGINATION_PER_PAGE', 10));
+
+        $services = $this->userServiceService->getServices(['service', 'country', 'state', 'location']);
+
+        $meta = [
+            'page' => $services->currentPage(),
+            'perPage' => $services->perPage(),
+            'total' => $services->total(),
+            'lastPage' => $services->lastPage()
+        ];
+
+        return Utilities::paginatedOk(UserServiceResource::collection($services), $meta);
+    }
+
     public function sendMessage(SendMessage $request)
     {
         try{

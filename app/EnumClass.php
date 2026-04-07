@@ -4,6 +4,7 @@ namespace App;
 
 use App\Enums\UserType;
 use App\Enums\FileType;
+use App\Enums\ServiceRequestStatus;
 
 class EnumClass 
 {
@@ -15,5 +16,10 @@ class EnumClass
     public static function fileTypes()
     {
         return array_column(FileType::cases(), 'value');
+    }
+
+    public static function serviceRequestStatuses()
+    {
+        return array_column(ServiceRequestStatus::cases(), 'value');
     }
 }

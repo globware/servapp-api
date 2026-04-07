@@ -10,10 +10,13 @@ use App\Models\Chat;
 
 use App\Services\UserServiceService;
 
+use app\Enums\ServiceRequestStatus;
+
 class ServiceRequestService 
 {
     public $count = [];
     public $serviceId = null;
+    public $status = null;
 
     public function save($data)
     {
@@ -40,6 +43,39 @@ class ServiceRequestService
         return $request;
     }
 
+    public function accept($requestId)
+    {
+        $request = $this->getRequest($requestId);
+        if(!$request) throw new AppException(402, "Service Request not found");
+
+        $request->status = ServiceRequestStatus::ENGAGED->value;
+        $request->update();
+
+        return $request;
+    }
+
+    public function cancel($requestId)
+    {
+        $request = $this->getRequest($requestId);
+        if(!$request) throw new AppException(402, "Service Request not found");
+
+        $request->status = ServiceRequestStatus::CANCELLED->value;
+        $request->update();
+
+        return $request;
+    }
+
+    public function complete($requestId)
+    {
+        $request = $this->getRequest($requestId);
+        if(!$request) throw new AppException(402, "Service Request not found");
+
+        $request->status = ServiceRequestStatus::COMPLETED->value;
+        $request->update();
+
+        return $request;
+    }
+
     public function getServiceRequests($serviceId)
     {
         return UserServiceRequest::with(['user', 'chats'])->where("user_service_id", $serviceId)->where("seen", false)->get();
@@ -53,6 +89,26 @@ class ServiceRequestService
         if($this->serviceId) $query->where("user_service_id", $this->serviceId);
 
         return $query->orderBy("created_at", "DESC")->get();
+    }
+
+    public function getProviderRequests($userId, $with=[])
+    {
+        if(!in_array("chats", $with)) $with[] = "chats";
+
+        $query = UserServiceRequest::with($with)->withCount($this->count)->whereHas("userService", function($serviceQuery) use($userId) { 
+            $serviceQuery->where("user_id", $userId);
+        });
+
+        if($this->serviceId) $query->where("user_service_id", $this->serviceId);
+
+        return $query->orderBy("created_at", "DESC")->get();
+    }
+
+    public function getRequests($with=[])
+    {
+        return UserServiceRequest::with($with)->when($this->status, function($query) {
+            $query->where("status", $this->status);
+        })->get();
     }
 
     public function getRequest($requestId, $with=[])

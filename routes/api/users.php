@@ -14,13 +14,15 @@ use App\Http\Controllers\UtilityController;
 Route::group(['middleware' => 'UserAuth', 'prefix' => '/user', 'namespace' => 'User',], function () {
     Route::get("/dashboard", [IndexController::class, "dashboard"]);
     Route::get("/logged_in_user", [IndexController::class, "loggedInUser"]);
-    Route::group(['prefix' => '/services'], function () {
+    Route::group(['prefix' => '/service_categories'], function () {
         Route::get("", [ServiceController::class, "getServices"]);
         Route::get("/get_by_location", [ServiceController::class, "getServicesByLocation"]);
         Route::get("/{serviceId}", [ServiceController::class, "getService"]);
     });
     Route::group(['prefix' => '/user_services'], function () {
+        Route::get("", [ServiceController::class, "getUserServices"]);
         Route::group(['prefix' => '/requests'], function () {
+            Route::get("", [ServiceRequestController::class, "getRequests"]);
             Route::post("/make_request", [ServiceRequestController::class, "requestService"]);
             Route::get("/{requestId}", [ServiceRequestController::class, "getRequest"])->middleware('NumericParam:requestId');
             Route::post("/send_message", [ServiceRequestController::class, "sendMessage"]);

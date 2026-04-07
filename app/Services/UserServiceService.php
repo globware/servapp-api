@@ -22,6 +22,10 @@ class UserServiceService
     public $userId = null;
     public $serviceId = null;
     public $count = [];
+    public $getCount = false;
+    public $limit = null;
+    public $page = 1;
+    public $paginated = false;
 
     public function __construct()
     {
@@ -180,12 +184,29 @@ class UserServiceService
 
     public function getServices($with=[])
     {
+        $limit = $this->limit;
+        if($this->paginated) {
+            if(!$limit) $limit = env('PAGINATION_PER_PAGE', 10);
+
+            $perPage = min(100, max(1, $limit));
+        }
+
         $query = UserService::with($with)->withCount($this->count);
 
         if($this->userId) $query = $query->where("user_id", $this->userId);
         if($this->serviceId) $query = $query->where("service_id", $this->serviceId);
 
-        return $query->orderBy("created_at", "DESC")->get();
+        if($this->getCount) return $query->count();
+
+        $query = $query->orderBy("created_at", "DESC");
+
+        if (!$this->paginated && $this->limit) {
+            $query->limit($this->limit);
+        }
+
+        if($this->paginated) return $query->paginate($perPage, ['*'], 'page', $this->page);
+
+        return $query->get();
     }
 
     public function getService($id, $with=[])
