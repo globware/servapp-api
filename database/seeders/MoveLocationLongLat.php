@@ -17,8 +17,8 @@ class MoveLocationLongLat extends Seeder
         $locations = Location::all();
         if($locations->count() > 0) {
             foreach($locations as $location) {
-                $location->long = $location->longitude;
-                $location->lat = $location->latitude;
+                $location->longitude = $location->longitude;
+                $location->latitude = $location->latitude;
                 $location->update();
             }
         }
