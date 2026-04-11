@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Exceptions\AppException;
 
-use App\Http\Requests\SaveFCMToken;
+use App\Http\Requests\SaveFcmToken;
 
 use App\Services\UserService;
 
