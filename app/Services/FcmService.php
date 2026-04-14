@@ -19,7 +19,7 @@ class FcmService
                 'message' => $message,
                 'created_at' => now()->toDateTimeString(),
             ])
-            ->withTarget('topic', $topic);
+            ->withTopic($topic);
 
         $messaging->send($message);
     }
