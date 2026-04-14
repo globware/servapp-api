@@ -30,9 +30,9 @@ class ServiceRequestService
         ->whereDate('created_at', Carbon::today())
         ->exists();
 
-        if ($alreadyRequestedToday) {
-            throw new AppException(402, "You have already requested this service today");
-        }
+        // if ($alreadyRequestedToday) {
+        //     throw new AppException(402, "You have already requested this service today");
+        // }
 
         $request = new UserServiceRequest;
         $request->user_service_id = $data['serviceId'];
