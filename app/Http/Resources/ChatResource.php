@@ -25,7 +25,7 @@ class ChatResource extends JsonResource
     {
         return [
             "message" => $this->message,
-            // "entity" => ($this->me()) ? $this->entity($this->sender) : $this->entity($this->receiver),
+            "entity" => ($this->me()) ? $this->entity($this->sender) : $this->entity($this->receiver),
             "me" => $this->me(),
             "seen" => $this->when(!$this->me(), $this->seen),
             "sentAt" => $this->created_at

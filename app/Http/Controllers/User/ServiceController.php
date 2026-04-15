@@ -114,7 +114,7 @@ class ServiceController extends Controller
         $this->userServiceService->page = (int) $request->query('page', 1);
         $this->userServiceService->limit = (int) $request->query('perPage', env('PAGINATION_PER_PAGE', 10));
 
-        $services = $this->userServiceService->getServices(['service', 'country', 'state', 'location']);
+        $services = $this->userServiceService->getServices(['service', 'country', 'state', 'location', 'media']);
 
         $meta = [
             'page' => $services->currentPage(),
