@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleController;
 
 use App\Http\Controllers\UtilityController;
+use App\Http\Controllers\ServiceCategoryController;
 
 use App\Http\Middleware\LogRequestUrl;
 
@@ -36,6 +37,10 @@ Route::domain(config('app.api_domain'))->group(function () {
 
     Route::group(['prefix' => '/utilities'], function () {
         Route::get("/states", [UtilityController::class, "states"]);
+    });
+
+    Route::group(['middleware' => 'UserAuth', 'prefix' => '/service_categories'], function () {
+        Route::get("", [ServiceCategoryController::class, "categories"]);
     });
 
     // Route::group(['prefix' => '/users'], function () {
