@@ -23,6 +23,10 @@ Route::domain(config('app.api_domain'))->group(function () {
         Route::post('/verify_email_token', [AuthController::class, "verifyEmailToken"]);
         Route::post('/register', [AuthController::class, "register"]);
 
+        Route::post('/send_password_reset_code', [AuthController::class, "sendPasswordResetCode"]);
+        Route::post('/verify_password_reset_code', [AuthController::class, "verifyPasswordResetToken"]);
+        Route::post('/reset_password', [AuthController::class, "resetPassword"]);
+
         Route::post('/google', [GoogleController::class, 'loginOrRegister']);
     });
 
