@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use app\Http\Requests\BaseRequest;
+use App\Http\Requests\BaseRequest;
 
 class SendPasswordResetCode extends BaseRequest
 {
