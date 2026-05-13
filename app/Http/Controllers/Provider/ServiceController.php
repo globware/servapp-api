@@ -63,6 +63,8 @@ class ServiceController extends Controller
     {
         $this->service->userId = Auth::user()->id;
         $this->service->count = ['requests'];
+        $this->service->approved = null;
+        $this->service->active = null;
         $services = $this->service->getServices(['media', 'tags', 'reviews', 'service']);
         
         return Utilities::ok(UserServiceResource::collection($services));

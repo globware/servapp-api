@@ -30,6 +30,8 @@ use App\Services\UserProfileService;
 use App\Mail\EmailVerification;
 use App\Mail\NewRegistration;
 
+use App\Enums\PasswordType;
+
 use App\Utilities;
 
 class AuthController extends Controller
@@ -153,7 +155,7 @@ class AuthController extends Controller
             if(!$user) return Utilities::error402("We cant find this email in our Database");
 
             DB::beginTransaction();
-            $token = $this->passwordService->savePasswordResetToken($email, PasswordTypes::USER->value);
+            $token = $this->passwordService->savePasswordResetToken($email, PasswordType::USER->value);
             Mail::to($email)->send(new SendPasswordResetCodeMail($token));
             DB::commit();
             return Utilities::okay(['message'=>'Reset Token Sent']);
@@ -171,7 +173,7 @@ class AuthController extends Controller
             $user = $this->userService->getByEmail($data['email']);
             if(!$user) return Utilities::error402("User not found");
             
-            $data['type'] = PasswordTypes::USER->value;
+            $data['type'] = PasswordType::USER->value;
             $res = $this->passwordService->validateEmailToken($data);
             if($res['success']) return Utilities::okay('password verified successfully');
             return Utilities::error402($res['error']);
@@ -184,7 +186,7 @@ class AuthController extends Controller
     {
         try{
             $data = $request->validated();
-            $resetToken = $this->passwordService->emailExists($data['email'], PasswordTypes::USER->value);
+            $resetToken = $this->passwordService->emailExists($data['email'], PasswordType::USER->value);
             if(!$resetToken) return Utilities::error402("You have not been cleared to reset this password, go through the password reset process");
             if(!$resetToken->verified) return Utilities::error402("Your password reset was not successful, click on the verify link sent to your mail");
 

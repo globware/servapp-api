@@ -26,6 +26,8 @@ class UserServiceService
     public $limit = null;
     public $page = 1;
     public $paginated = false;
+    public $approved = true;
+    public $active = true;
 
     public function __construct()
     {
@@ -195,6 +197,8 @@ class UserServiceService
 
         if($this->userId) $query = $query->where("user_id", $this->userId);
         if($this->serviceId) $query = $query->where("service_id", $this->serviceId);
+        if($this->approved) $query = $query->where("approved", $this->approved);
+        if($this->active) $query = $query->where("active", $this->active);
 
         if($this->getCount) return $query->count();
 
