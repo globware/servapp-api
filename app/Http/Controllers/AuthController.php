@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Exceptions\AppException;
 
 use App\Http\Requests\Login;
@@ -16,7 +17,7 @@ use App\Http\Requests\SendPasswordResetCode;
 use App\Http\Requests\ResetPassword;
 use App\Http\Requests\VerifyPasswordResetToken;
 
-use app\Mail\SendPasswordResetCode as sendPasswordResetCodeMail;
+use App\Mail\SendPasswordResetCode as sendPasswordResetCodeMail;
 
 use App\Http\Resources\UserResource;
 
@@ -158,7 +159,7 @@ class AuthController extends Controller
             return Utilities::okay(['message'=>'Reset Token Sent']);
         }catch(\Exception $e){
             DB::rollBack();
-            return Utilities::error($e, 'An error occured while trying to send verification mail, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
         }
     }
 
@@ -175,7 +176,7 @@ class AuthController extends Controller
             if($res['success']) return Utilities::okay('password verified successfully');
             return Utilities::error402($res['error']);
         }catch(\Exception $e){
-            return Utilities::error($e, 'An error occured while trying to send verification mail, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
         }
     }
 
