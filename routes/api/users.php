@@ -24,6 +24,7 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/user', 'namespace' => 'U
         Route::group(['prefix' => '/requests'], function () {
             Route::get("", [ServiceRequestController::class, "getRequests"]);
             Route::post("/make_request", [ServiceRequestController::class, "requestService"]);
+            Route::patch("/cancel/{requestId}", [ServiceRequestController::class, "cancel"])->middleware('NumericParam:requestId');
             Route::get("/{requestId}", [ServiceRequestController::class, "getRequest"])->middleware('NumericParam:requestId');
             Route::post("/send_message", [ServiceRequestController::class, "sendMessage"]);
             Route::get("/chat_messages/{requestId}", [ServiceRequestController::class, "getRequestChats"])->middleware('NumericParam:requestId');

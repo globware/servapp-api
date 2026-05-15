@@ -45,6 +45,17 @@ class ServiceRequestController extends Controller
         }
     }
 
+    public function cancel($requestId)
+    {
+        try{
+            $request = $this->requestService->cancel($requestId);
+
+            return Utilities::ok(new ServiceRequestResource($request));
+        } catch(\Exception $e) {
+            throw $e;
+        }
+    }
+
     public function getRequest($requestId)
     {
         try{
