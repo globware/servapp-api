@@ -8,10 +8,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 
-use app\Models\Customer;
-use app\Models\PasswordResetToken;
-use app\Models\ClientPasswordResetToken;
-use app\Enums\PasswordType;
+use App\Models\Customer;
+use App\Models\PasswordResetToken;
+use App\Models\ClientPasswordResetToken;
+use App\Enums\PasswordType;
 
 /**
  * password service class
