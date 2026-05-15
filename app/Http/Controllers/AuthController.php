@@ -161,7 +161,8 @@ class AuthController extends Controller
             return Utilities::okay(['message'=>'Reset Token Sent']);
         }catch(\Exception $e){
             DB::rollBack();
-            return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
+            throw $e;
+            // return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
         }
     }
 
