@@ -148,6 +148,7 @@ class PasswordService
             $model->email = $email;
             $model->token_signature = $signatureToken['signature'];
             $model->expires_at = Carbon::now()->addMinutes(30);
+            $model->token = $signatureToken['token'];
             $model->save();
             return $signatureToken['token'];
         }catch(\Exception $e){
