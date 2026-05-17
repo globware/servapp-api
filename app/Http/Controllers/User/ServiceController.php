@@ -100,7 +100,7 @@ class ServiceController extends Controller
     public function getUserService(Request $request, $serviceId)
     {
         $this->userServiceService->count = ['requests'];
-        $userService = $this->userServiceService->getService($serviceId, ['media', 'tags', 'reviews']);
+        $userService = $this->userServiceService->getService($serviceId, ['service', 'media', 'tags', 'reviews']);
         if(!$userService) return Utilities::error402("Service not found");
 
         $requests = $this->requestService->getUserRequests(Auth::user()->id, ['service']);
