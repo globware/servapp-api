@@ -59,7 +59,7 @@ class ServiceRequestController extends Controller
 
     public function getRequests()
     {
-        $requests = $this->requestService->getProviderRequests(Auth::user()->id, ['userService']);
+        $requests = $this->requestService->getProviderRequests(Auth::user()->id, ['userService', 'user']);
 
         return Utilities::ok(ServiceRequestResource::collection($requests));
     }

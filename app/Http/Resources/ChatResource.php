@@ -40,8 +40,9 @@ class ChatResource extends JsonResource
 
     private function me()
     {
-        if($this->sender_type == User::$type && $this->sender_id == Auth::user()->id) return true;
-        if($this->request->userService->user_id == Auth::user()->id) return true;
+        if($this->sender_id == Auth::user()->id) return true;
+        // if($this->sender_type == User::$type && $this->sender_id == Auth::user()->id) return true;
+        // if($this->request->userService->user_id == Auth::user()->id) return true;
         return false;
     }
 }
