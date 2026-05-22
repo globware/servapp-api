@@ -53,7 +53,8 @@ class ChatResource extends JsonResource
 
         // Sender is a UserService (provider) — compare via the request's userService owner
         if ($this->sender_type === UserService::$type) {
-            return $this->resource->userServiceRequest->userService->user_id === $user->id;
+            return $this->request->userService->user_id === $user->id;
+            // return $this->resource->userServiceRequest->userService->user_id === $user->id;
         }
 
         return false;
