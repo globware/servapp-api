@@ -102,4 +102,17 @@ class ServiceRequestController extends Controller
             throw $e;
         }
     }
+
+    public function completed(int $requestId)
+    {
+        try{
+            $request = $this->requestService->complete($requestId);
+
+            return Utilities::okay("Successful");
+        } catch(AppException $e) {
+            throw $e;
+        } catch(\Exception $e) {
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
+        }
+    }
 }

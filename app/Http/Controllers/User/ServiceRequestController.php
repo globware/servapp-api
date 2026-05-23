@@ -40,8 +40,10 @@ class ServiceRequestController extends Controller
             $serviceRequest = $this->requestService->save($data);
 
             return Utilities::ok(new ServiceRequestResource($serviceRequest));
-        } catch(\Exception $e) {
+        } catch(AppException $e) {
             throw $e;
+        } catch(\Exception $e) {
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
     }
 
@@ -51,8 +53,10 @@ class ServiceRequestController extends Controller
             $request = $this->requestService->cancel($requestId);
 
             return Utilities::ok(new ServiceRequestResource($request));
-        } catch(\Exception $e) {
+        } catch(AppException $e) {
             throw $e;
+        } catch(\Exception $e) {
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
     }
 
@@ -65,8 +69,10 @@ class ServiceRequestController extends Controller
             if($serviceRequest->user_id != Auth::user()->id) return Utilities::error402("You are not authorized to view this request");
 
             return Utilities::ok(new ServiceRequestResource($serviceRequest, User::$type));
-        } catch(\Exception $e) {
+        } catch(AppException $e) {
             throw $e;
+        } catch(\Exception $e) {
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
     }
 
@@ -92,8 +98,10 @@ class ServiceRequestController extends Controller
             $this->chatService->sendMessage($data);
 
             return Utilities::okay("Message sent");
-        } catch(\Exception $e) {
+        } catch(AppException $e) {
             throw $e;
+        } catch(\Exception $e) {
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
     }
 
@@ -112,8 +120,23 @@ class ServiceRequestController extends Controller
             $chats = $this->chatService->getMessages($requestId);
 
             return Utilities::ok(ChatResource::collection($chats));
-        } catch(\Exception $e) {
+        } catch(AppException $e) {
             throw $e;
+        } catch(\Exception $e) {
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
+        }
+    }
+
+    public function completed(int $requestId)
+    {
+        try{
+            $request = $this->requestService->complete($requestId);
+
+            return Utilities::okay("Successful");
+        } catch(AppException $e) {
+            throw $e;
+        } catch(\Exception $e) {
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
     }
 
