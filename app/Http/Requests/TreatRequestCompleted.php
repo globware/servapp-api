@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseRequest;
-use App\Rules\ValidServiceRequest;
 
-class RateService extends BaseRequest
+class TreatRequestCompleted extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +23,7 @@ class RateService extends BaseRequest
     public function rules(): array
     {
         return [
-            // "serviceId" => "required|integer",
-            "requestId" => "required|integer",
-            "rating" => "required|integer|max:5|min:1"
+            "approved" => "required|boolean"
         ];
     }
 }

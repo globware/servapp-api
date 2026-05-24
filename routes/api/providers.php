@@ -18,6 +18,7 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
             Route::get("/chat_messages/{requestId}", [ServiceRequestController::class, "getRequestChats"])->middleware('NumericParam:requestId');
             Route::post("/accept/{requestId}", [ServiceRequestController::class, "accept"])->middleware('NumericParam:requestId');
             Route::patch("/complete/{requestId}", [ServiceRequestController::class, "completed"])->middleware('NumericParam:requestId');
+            Route::patch("/treat_completed/{requestId}", [ServiceRequestController::class, "treatCompleted"])->middleware('NumericParam:requestId');
             Route::get("/{requestId}", [ServiceRequestController::class, "getRequest"])->middleware('NumericParam:requestId');
         });
         Route::get("", [ServiceController::class, "services"]);

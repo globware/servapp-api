@@ -65,23 +65,49 @@ class ServiceRequestService
         return $request;
     }
 
-    public function complete($requestId)
+    public function complete(int $requestId, array $data, int $userId)
     {
         $request = $this->getRequest($requestId);
         if(!$request) throw new AppException(402, "Service Request not found");
 
+        if($data['completedBy'] == 'user') {
+            if($request->user_id != $userId) throw new AppException(402, "You are not eligible to perform this operation");
+        }else{
+            if($request->userService->user_id != $userId) throw new AppException(402, "You are not eligible to perform this operation");
+        }
+
+        $request->completed_by = $data['completedBy'];
+        $request->service_rendered = $data['rendered'];
+        if(isset($data['reason'])) $request->unrendered_reason = $data['reason'];
         $request->status = ServiceRequestStatus::COMPLETED->value;
-        $request->update();
+        $request->save();
 
         return $request;
     }
 
-    public function getServiceRequests($serviceId)
+    public function treatCompleted(int $requestId, bool $approved, int $userId)
+    {
+        $request = $this->getRequest($requestId);
+        if(!$request) throw new AppException(402, "Service Request not found");
+
+        if($request->completed_by == 'user') {
+            if($request->userService->user_id != $userId) throw new AppException(402, "You are not eligible to perform this operation");
+        }else{
+            if($request->user_id != $userId) throw new AppException(402, "You are not eligible to perform this operation");
+        }
+
+        $request->completed_approved = $approved;
+        $request->save();
+
+        return $request;
+    }
+
+    public function getServiceRequests(int $serviceId)
     {
         return UserServiceRequest::with(['user', 'chats'])->where("user_service_id", $serviceId)->where("seen", false)->get();
     }
 
-    public function getUserRequests($userId, $with=[])
+    public function getUserRequests(int $userId, $with=[])
     {
         if(!in_array("chats", $with)) $with[] = "chats";
 

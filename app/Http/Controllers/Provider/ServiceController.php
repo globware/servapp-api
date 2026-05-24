@@ -65,7 +65,7 @@ class ServiceController extends Controller
         $this->service->count = ['requests'];
         $this->service->approved = null;
         $this->service->active = null;
-        $services = $this->service->getServices(['media', 'tags', 'reviews', 'service']);
+        $services = $this->service->getServices(['media', 'tags', 'feedbacks', 'service']);
         
         return Utilities::ok(UserServiceResource::collection($services));
     }
@@ -123,7 +123,7 @@ class ServiceController extends Controller
 
             DB::commit();
 
-            $service = $this->service->getService($service->id, ['media, tags']);
+            $service = $this->service->getService($service->id, ['media', 'tags']);
 
             return Utilities::ok(new UserServiceResource($service));
 

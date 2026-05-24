@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Exceptions\AppException;
 
 use App\Http\Requests\SendMessage;
-use App\Http\Requests\User\ReviewService as ReviewServiceRequest;
-use App\Http\Requests\User\RateService;
 use App\Http\Requests\User\Complain;
 
 use App\Http\Resources\ServiceResource;
@@ -21,8 +19,6 @@ use App\Services\ServiceService;
 use App\Services\UserServiceService;
 use App\Services\MessageService;
 use App\Services\ServiceRequestService;
-use App\Services\ReviewService;
-use App\Services\RatingService;
 use App\Services\ComplaintService;
 
 use App\Models\UserService;
@@ -36,21 +32,16 @@ class ServiceController extends Controller
     protected $userServiceService;
     protected $messageService;
     protected $requestService;
-    protected $reviewService;
-    protected $ratingService;
     protected $complaintService;
 
     public function __construct(ServiceService $serviceService, UserServiceService $userServiceService, MessageService $messageService, 
-                                    ServiceRequestService $requestService, ReviewService $reviewService, RatingService $ratingService, 
-                                    ComplaintService $complaintService
+                                    ServiceRequestService $requestService, ComplaintService $complaintService
                                 )
     {
         $this->serviceService = $serviceService;
         $this->userServiceService = $userServiceService;
         $this->messageService = $messageService;
         $this->requestService = $requestService;
-        $this->reviewService = $reviewService;
-        $this->ratingService = $ratingService;
         $this->complaintService = $complaintService;
     }
 
@@ -158,49 +149,6 @@ class ServiceController extends Controller
             $this->messageService->markAsRead($userService, UserService::class);
 
             return Utilities::okay("Messages marked as read");
-        } catch (AppException $e) {
-            throw $e;
-        }
-    }
-
-    public function review(ReviewServiceRequest $request)
-    {
-        try{
-            $data = $request->validated();
-            $data['userId'] = Auth::user()->id;
-            $data['targetId'] = $data['serviceId'];
-            $data['targetType'] = UserService::$type;
-
-            $this->reviewService->save($data);
-
-            return Utilities::okay("Review sent");
-        } catch (AppException $e) {
-            throw $e;
-        }
-    }
-
-    /*
-        Rate a Service
-    **/
-    public function rate(RateService $request)
-    {
-        try{
-            $data = $request->validated();
-
-            $request = $this->requestService->getRequest($data['requestId']);
-            if(!$request) return Utilities::error402("User Request is not found");
-
-            if($request->userService->user_id == Auth::user()->id) return Utilities::error402("You cannot rate yourself!");
-
-            if($request->user_id != Auth::user()->id) return Utilities::error402("You are not authorized to rate this");
-
-            $data['userId'] = Auth::user()->id;
-            $data['targetId'] = $request->user_service_id;
-            $data['targetType'] = UserService::$type;
-
-            $this->ratingService->save($data);
-
-            return Utilities::okay("Rating sent");
         } catch (AppException $e) {
             throw $e;
         }

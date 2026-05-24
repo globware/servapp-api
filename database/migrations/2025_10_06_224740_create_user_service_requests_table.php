@@ -17,6 +17,11 @@ return new class extends Migration
             $table->foreignId("user_id");
             $table->text("message");
             $table->boolean("seen")->default(false);
+            $table->string("Status");
+            $table->boolean("service_rendered")->nullable();
+            $table->string("unrendered_reason", 255)->nullable();
+            $table->string("completed_by")->nullable(); // user or provider
+            $table->boolean("completed_approved")->nullable();
             $table->timestamps();
         });
     }

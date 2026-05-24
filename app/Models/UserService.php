@@ -86,9 +86,20 @@ class UserService extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function userRatings()
+    // public function userFeedbacks()
+    // {
+    //     return $this->morphMany(UserFeedback::class, 'target');
+    // }
+    public function feedbacks()
     {
-        return $this->morphMany(Rating::class, 'target');
+        return $this->hasManyThrough(
+            UserFeedback::class,
+            UserServiceRequest::class,
+            'user_service_id',  // FK on user_service_requests
+            'target_id',        // FK on user_feedbacks
+            'id',               // local key on user_services
+            'id'                // local key on user_service_requests
+        )->where('user_feedbacks.target_type', UserServiceRequest::$type);
     }
 
     public function inbox()
@@ -131,9 +142,9 @@ class UserService extends Model
 
     public function rating()
     {
-        if($this->userRatings->count() > 0) {
+        if($this->feedBacks->count() > 0) {
             $ratingsArr = [];
-            foreach($this->userRatings as $rating) $ratingsArr[] = $rating->ratings;
+            foreach($this->feedbacks as $feedback) $ratingsArr[] = $feedback->ratings;
             $average = Helpers::getAverage($ratingsArr);
             return ($average) ? $average : $this->ratings;
         }
@@ -142,7 +153,11 @@ class UserService extends Model
 
     public function reviews()
     {
-        return $this->morphMany(Review::class, 'target');
+        $reviews = [];
+        if($this->feedBacks->count() > 0) {
+            foreach($this->feedbacks as $feedback) if($feedback->review) $reviews[] = $feedback->review;
+        }
+        return $reviews;
     }
 
     public function patronizers()

@@ -27,7 +27,9 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/user', 'namespace' => 'U
             Route::patch("/cancel/{requestId}", [ServiceRequestController::class, "cancel"])->middleware('NumericParam:requestId');
             Route::get("/{requestId}", [ServiceRequestController::class, "getRequest"])->middleware('NumericParam:requestId');
             Route::post("/send_message", [ServiceRequestController::class, "sendMessage"]);
-            Route::patch("/complete/{requestId}", [ServiceRequestController::class, "completed"])->middleware('NumericParam:requestId');
+            Route::patch("/complete/{requestId}", [ServiceRequestController::class, "completed"]);
+            Route::patch("/treat_completed/{requestId}", [ServiceRequestController::class, "treatCompleted"])->middleware('NumericParam:requestId');
+            Route::patch("/feedback/{id}", [ServiceRequestController::class, "feedback"])->middleware('NumericParam:id');
             Route::get("/chat_messages/{requestId}", [ServiceRequestController::class, "getRequestChats"])->middleware('NumericParam:requestId');
         });
 

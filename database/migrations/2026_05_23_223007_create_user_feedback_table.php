@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ratings', function (Blueprint $table) {
+        Schema::create('user_feedback', function (Blueprint $table) {
             $table->id();
-            $table->morphs("target");
             $table->foreignId("user_id");
-            $table->tinyInteger("ratings");
-            $table->foreignId("user_service_request_id");
+            $table->morphs("target");
+            $table->tinyInteger("rating")->nullable();
+            $table->text("review")->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_ratings');
+        Schema::dropIfExists('user_feedback');
     }
 };

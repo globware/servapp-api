@@ -15,7 +15,6 @@ use App\Http\Resources\StateResource;
 use App\Http\Resources\LocationResource;
 use App\Http\Resources\PatronizerResource;
 use App\Http\Resources\ServiceRequestResource;
-use App\Http\Resources\ServiceReviewResource;
 use App\Http\Resources\ChatResource;
 
 class UserServiceResource extends JsonResource
@@ -63,7 +62,7 @@ class UserServiceResource extends JsonResource
             "documents" => FileResource::collection($this->whenLoaded("documents")),
             "requestsCount" => $this->whenCounted("requests"),
             "requests" => ServiceRequestResource::collection($this->whenLoaded("requests")),
-            "reviews" => ReviewResource::collection($this->whenLoaded("reviews")),
+            "reviews" => $this->when($this->relationLoaded("feedbacks"), fn() => $this->reviews()),
             "patronizers" => PatronizerResource::collection($this->whenLoaded("patronizers")),
             "chats" => ChatResource::collection($this->whenLoaded("chats"))
         ];

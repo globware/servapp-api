@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseRequest;
 
-class ReviewService extends BaseRequest
+class CompleteService extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,8 @@ class ReviewService extends BaseRequest
     public function rules(): array
     {
         return [
-            "serviceId" => "required|integer",
-            "review" => "required|string"
+            "rendered" => "required|boolean",
+            "reason" => "required_if:rendered,false|string"
         ];
     }
 }

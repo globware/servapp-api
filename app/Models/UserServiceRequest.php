@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserServiceRequest extends Model
 {
-    public $type = "App\Models\UserServiceRequest";
+    public static $type = "App\Models\UserServiceRequest";
     
     public function user()
     {

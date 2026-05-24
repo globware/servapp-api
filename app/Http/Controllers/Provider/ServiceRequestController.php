@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use App\Exceptions\AppException;
 
 use App\Http\Requests\Provider\SendChatMessage;
+use App\Http\Requests\CompleteService;
+use App\Http\Requests\TreatRequestCompleted;
 
 use App\Http\Resources\ServiceRequestResource;
 use App\Http\Resources\ChatResource;
@@ -103,10 +105,26 @@ class ServiceRequestController extends Controller
         }
     }
 
-    public function completed(int $requestId)
+    public function completed(CompleteService $request, int $requestId)
     {
         try{
-            $request = $this->requestService->complete($requestId);
+            $data = $request->validated();
+            $data['completedBy'] = 'provider';
+
+            $request = $this->requestService->complete($requestId, $data, Auth::user()->id);
+
+            return Utilities::okay("Successful");
+        } catch(AppException $e) {
+            throw $e;
+        } catch(\Exception $e) {
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
+        }
+    }
+
+    public function treatCompleted(TreatRequestCompleted $request, int $requestId)
+    {
+        try{
+            $this->requestService->treatCompleted($requestId, $request->validated("approved"), Auth::user()->id);
 
             return Utilities::okay("Successful");
         } catch(AppException $e) {
