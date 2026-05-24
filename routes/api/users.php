@@ -35,8 +35,6 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/user', 'namespace' => 'U
 
         Route::post("/send_message", [ServiceController::class, "sendMessage"]);
         Route::get("/{userServiceId}", [ServiceController::class, "getUserService"]);
-        Route::post("/review", [ServiceController::class, "review"]);
-        Route::post("/rate", [ServiceController::class, "rate"]);
         Route::patch("/read_messages/{serviceId}", [ServiceController::class, "readMessage"]);
         Route::post("/complain", [ServiceController::class, "complain"]);
     });
