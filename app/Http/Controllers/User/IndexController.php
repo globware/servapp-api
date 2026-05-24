@@ -52,7 +52,7 @@ class IndexController extends Controller
         }
 
         $topServices = $this->userServiceService->getTopServices(4);
-        $topServices->load(['media', 'tags', 'reviews', 'service']);
+        $topServices->load(['media', 'tags', 'service']);
 
         return Utilities::ok([
             "services" => ServiceResource::collection($services),
