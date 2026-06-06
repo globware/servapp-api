@@ -7,14 +7,13 @@ use Kreait\Firebase\Messaging\CloudMessage;
 class FcmService 
 {
     
-    public function publish($topic, $message, $chatId)
+    public function publish(string $topic, string $message, array $meta)
     {
         $messaging = app('firebase.messaging');
 
         $message = CloudMessage::new()
             ->withData([
-                'type' => 'chat_message',
-                'chat_id' => (string) $chatId,
+                'meta' => $meta,
                 // 'sender_id' => (string) auth()->id(),
                 'message' => $message,
                 'created_at' => now()->toDateTimeString(),

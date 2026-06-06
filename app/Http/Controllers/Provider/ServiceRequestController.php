@@ -20,6 +20,8 @@ use App\Services\ServiceRequestService;
 use App\Services\ChatService;
 
 use App\Models\UserService;
+use App\Models\VwUserServiceRequestCount;
+use App\Models\VwUserServiceRequestCountByUser;
 
 use App\Utilities;
 
@@ -132,5 +134,33 @@ class ServiceRequestController extends Controller
         } catch(\Exception $e) {
             return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
+    }
+
+    public function stats($serviceId=null)
+    {
+        $providerRequestCount = VwUserServiceRequestCountByUser::where("owner_user_id", Auth::user()->id)->first();
+        $userStats = [
+            "services" => $providerRequestCount->total_services,
+            "requests" => $providerRequestCount->total_requests,
+            "pendingRequests" => $providerRequestCount->pending_count,
+            "engagedRequests" => $providerRequestCount->engaged_count,
+            "completedRequests" => $providerRequestCount->completed_count,
+            "cancelledRequests" => $providerRequestCount->cancelled_count,
+        ];
+
+        $stats = ["userStats" => $userStats];
+        if($serviceId) {
+            $serviceRequestCount = VwUserServiceRequestCount::where("user_service_id", $serviceId)->first();
+            $serviceStats = [
+                "requests" => $serviceRequestCount->total_requests,
+                "pendingRequests" => $serviceRequestCount->pending_count,
+                "engagedRequests" => $serviceRequestCount->engaged_count,
+                "completedRequests" => $serviceRequestCount->completed_count,
+                "cancelledRequests" => $serviceRequestCount->cancelled_count,
+            ];
+            $stats['serviceStats'] = $serviceStats;
+        }
+
+        return Utilities::ok($stats);
     }
 }

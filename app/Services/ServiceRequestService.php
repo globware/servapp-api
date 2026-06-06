@@ -9,6 +9,7 @@ use App\Models\UserServiceRequest;
 use App\Models\Chat;
 
 use App\Services\UserServiceService;
+use App\Services\FcmService;
 
 use App\Enums\ServiceRequestStatus;
 
@@ -18,7 +19,7 @@ class ServiceRequestService
     public $serviceId = null;
     public $status = null;
 
-    public function save($data)
+    public function save(array $data)
     {
         $service = new UserServiceService;
         $userService = $service->getService($data['serviceId']);
@@ -40,10 +41,17 @@ class ServiceRequestService
         $request->message = $data['message'];
         $request->save();
 
+        $topic = 'user_'.$userService->user_id;
+        $meta = [
+            "type" => "service_request",
+            "requestId" => $request->id
+        ];
+        app(FcmService::class)->publish($topic, $data['message'], $meta);
+
         return $request;
     }
 
-    public function accept($requestId)
+    public function accept(int $requestId)
     {
         $request = $this->getRequest($requestId);
         if(!$request) throw new AppException(402, "Service Request not found");

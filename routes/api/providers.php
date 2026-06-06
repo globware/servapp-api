@@ -14,6 +14,8 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
     Route::group(['prefix' => '/services'], function () {
         Route::group(['prefix' => '/requests'], function () {
             Route::get("", [ServiceRequestController::class, "getRequests"]);
+            Route::get("/stats", [ServiceRequestController::class, "stats"]);
+            Route::get("/stats/{serviceId}", [ServiceRequestController::class, "stats"])->middleware('NumericParam:serviceId');
             Route::post("/send_message", [ServiceRequestController::class, "sendMessage"]);
             Route::get("/chat_messages/{requestId}", [ServiceRequestController::class, "getRequestChats"])->middleware('NumericParam:requestId');
             Route::post("/accept/{requestId}", [ServiceRequestController::class, "accept"])->middleware('NumericParam:requestId');

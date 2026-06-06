@@ -58,10 +58,16 @@ class ChatService
 
             $fcmService = new FcmService;
 
-            if($user) $fcmService->send($user, $data['message'], $data['request']->id);
+            $receiverUserId = ($data['entityType'] == User::$type) ? $data['request']->userService?->user_id : $data['request']->user_id;
+
+            // if($user) $fcmService->send($user, $data['message'], $data['request']->id);
             
-            $topic = 'service-request-'.$data['request']->id;
-            $fcmService->publish($topic, $data['message'], $data['request']->id);
+            $topic = 'user_'.$receiverUserId;
+            $meta = [
+                "type" => "request_chat",
+                "requestId" => $data['request']->id
+            ];
+            $fcmService->publish($topic, $data['message'], $meta);
 
             // if($user) $this->sendFcmMessage($user, $data['request']->id, $data['message']);
 
