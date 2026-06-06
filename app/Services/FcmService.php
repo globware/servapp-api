@@ -13,7 +13,7 @@ class FcmService
 
         $message = CloudMessage::new()
             ->withData([
-                'meta' => $meta,
+                'meta' => json_encode($meta),
                 // 'sender_id' => (string) auth()->id(),
                 'message' => $message,
                 'created_at' => now()->toDateTimeString(),
