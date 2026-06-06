@@ -65,6 +65,19 @@ class ServiceRequestService
         $request->status = ServiceRequestStatus::ENGAGED->value;
         $request->update();
 
+        $topic = 'user_'.$request->user_id;
+        $meta = [
+            "request" => $request
+        ];
+        $data = [
+                "topic" => $topic,
+                "message" => '',
+                "type" => "request_accepted",
+                "title" => "Service Request Accepted",
+                "meta" => $meta
+        ];
+        app(FcmService::class)->publish($data);
+
         return $request;
     }
 
@@ -75,6 +88,19 @@ class ServiceRequestService
 
         $request->status = ServiceRequestStatus::CANCELLED->value;
         $request->update();
+
+        $topic = 'user_'.$request->userService->user_id;
+        $meta = [
+            "request" => $request
+        ];
+        $data = [
+                "topic" => $topic,
+                "message" => '',
+                "type" => "request_cancelled",
+                "title" => "Service Request Cancelled",
+                "meta" => $meta
+        ];
+        app(FcmService::class)->publish($data);
 
         return $request;
     }
@@ -95,6 +121,21 @@ class ServiceRequestService
         if(isset($data['reason'])) $request->unrendered_reason = $data['reason'];
         $request->status = ServiceRequestStatus::COMPLETED->value;
         $request->save();
+
+
+        $receiverUserId = ($data['completedBy'] == 'user') ? $request->user_id : $request->userService->user_id; 
+        $topic = 'user_'.$receiverUserId;
+        $meta = [
+            "request" => $request
+        ];
+        $data = [
+                "topic" => $topic,
+                "message" => '',
+                "type" => "request_completed",
+                "title" => "Service Request Completed",
+                "meta" => $meta
+        ];
+        app(FcmService::class)->publish($data);
 
         return $request;
     }
