@@ -43,10 +43,16 @@ class ServiceRequestService
 
         $topic = 'user_'.$userService->user_id;
         $meta = [
-            "type" => "service_request",
-            "requestId" => $request->id
+            "request" => $request
         ];
-        app(FcmService::class)->publish($topic, $data['message'], $meta);
+        $data = [
+                "topic" => $topic,
+                "message" => $data['message'],
+                "type" => "service_request",
+                "title" => "Service Request",
+                "meta" => $meta
+        ];
+        app(FcmService::class)->publish($data);
 
         return $request;
     }

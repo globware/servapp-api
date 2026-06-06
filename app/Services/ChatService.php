@@ -64,10 +64,17 @@ class ChatService
             
             $topic = 'user_'.$receiverUserId;
             $meta = [
-                "type" => "request_chat",
-                "requestId" => $data['request']->id
+                "request" => $data['request']
             ];
-            $fcmService->publish($topic, $data['message'], $meta);
+            $data = [
+                "topic" => $topic,
+                "message" => $data['message'],
+                "type" => "request_chat",
+                "title" => "Request Chat",
+                "meta" => $meta
+            ];
+            
+            $fcmService->publish($data);
 
             // if($user) $this->sendFcmMessage($user, $data['request']->id, $data['message']);
 
