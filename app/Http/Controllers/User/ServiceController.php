@@ -50,7 +50,7 @@ class ServiceController extends Controller
         $this->serviceService->limit = 5;
         $this->serviceService->approved = true;
         $services = collect([]);
-        $services = $this->serviceService->getServices(['userServices.service', 'userServices.media', 'userServices.tags', 'userServices.feedbacks']);
+        $services = $this->serviceService->getServices(['userServices']);
 
         return Utilities::ok(ServiceResource::collection($services));
         
@@ -82,7 +82,9 @@ class ServiceController extends Controller
 
     public function getService(Request $request, $serviceId)
     {
-        $service = $this->serviceService->getService($serviceId, ['userServices' => fn($query) => $query->where('approved', true)]);
+        $service = $this->serviceService->getService($serviceId, [
+            'userServices' => fn($query) => $query->where('approved', true)->with(['service', 'media', 'tags', 'feedbacks'])
+        ]);
         if(!$service) return Utilities::error402("Service not found");
 
         return Utilities::ok(new ServiceResource($service));
