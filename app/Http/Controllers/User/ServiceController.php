@@ -50,7 +50,7 @@ class ServiceController extends Controller
         $this->serviceService->limit = 5;
         $this->serviceService->approved = true;
         $services = collect([]);
-        $services = $this->serviceService->getServices();
+        $services = $this->serviceService->getServices(['userService' => ['service', 'media', 'tags', 'feedbacks']]);
 
         return Utilities::ok(ServiceResource::collection($services));
         
