@@ -206,9 +206,6 @@ class UserService extends Model
         parent::boot();
 
         static::deleting(function (UserService $service) {
-            if($service->userRatings->count() > 0) {
-                foreach($service->userRatings as $rating) $rating->delete();
-            }
 
             if($service->reviews->count() > 0) {
                 foreach($service->reviews as $review) $review->delete();
