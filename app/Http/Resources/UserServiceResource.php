@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Resources\UserResource;
 use App\Http\Resources\ServiceResource;
@@ -51,6 +52,7 @@ class UserServiceResource extends JsonResource
             "verified" => $this->verified,
             "approved" => $this->approved,
             "active" => $this->active,
+            "myService" => ($this->user_id == Auth::user()->id),
             "coverPhoto" => new FileResource($this->coverPhoto),
             "user" => new UserResource($this->whenLoaded("user")),
             "service" => new ServiceResource($this->whenLoaded("service")),
