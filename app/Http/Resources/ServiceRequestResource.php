@@ -18,13 +18,13 @@ class ServiceRequestResource extends JsonResource
 
     protected $unSeenChats = null;
 
-    public function __construct($resource, $entityType=null)
+    public function __construct($resource, $entityType = null)
     {
         parent::__construct($resource);
-        if($entityType) {
-            if($this->chats->count() == 0) {
+        if ($entityType) {
+            if ($this->chats->count() == 0) {
                 $this->unSeenChats = 0;
-            }else{
+            } else {
                 $chatService = new ChatService;
                 $chatService->seen = false;
                 $chatService->receiverId = ($entityType == User::$type) ? $this->user_id : $this->user_service_id;
@@ -46,13 +46,14 @@ class ServiceRequestResource extends JsonResource
             "status" => $this->status,
             "message" => $this->message,
             "seen" => $this->seen,
+            "completedBy" => $this->completed_by,
             "user" => new UserResource($this->whenLoaded('user')),
             "service" => new UserServiceResource($this->whenLoaded("userService")),
             "chats" => ChatResource::collection($this->chats),
             "requestedAt" => $this->created_at
         ];
 
-        if($this->unSeenChats) $resource['unSeenChats'] = $this->unSeenChats;
+        if ($this->unSeenChats) $resource['unSeenChats'] = $this->unSeenChats;
 
         return $resource;
     }
