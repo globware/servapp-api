@@ -84,6 +84,12 @@ class UserService
         return $user;
     }
 
+    public function changePassword(string $password, User $user)
+    {
+        $user->password =  bcrypt($password);
+        $user->update();
+    }
+
     public function getUser($id, $with=[])
     {
         return User::with($with)->withCount($this->count)->where("id", $id)->first();

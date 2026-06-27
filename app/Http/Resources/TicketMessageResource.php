@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\TicketResource;
 use App\Http\Resources\AdminResource;
 
-class TicketMessage extends JsonResource
+class TicketMessageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -21,6 +21,7 @@ class TicketMessage extends JsonResource
             "id" => $this->id,
             "message" => $this->message,
             "ticket" => new TicketResource($this->whenLoaded("ticket")),
+            "isAdmin" => ($this->admin_id != null),
             "admin" => new AdminResource($this->whenLoaded("admin"))
         ];
     }

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use App\Http\Resources\UserResource;
+use App\Http\Resources\AdminResource;
+use App\Http\Resources\TicketMessageResource;
 
 class TicketResource extends JsonResource
 {
@@ -22,7 +24,8 @@ class TicketResource extends JsonResource
             "inProgress" => $this->in_progress,
             "resolved" => $this->resolved,
             "user" => new UserResource($this->user),
-            "resolvedBy" => new UserResource($this->resolvedBy)
+            "resolvedBy" => new AdminResource($this->resolvedBy),
+            "messages" => TicketMessageResource::collection($this->whenLoaded("messages"))
         ];
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\GoogleController;
 
 use App\Http\Controllers\UtilityController;
 use App\Http\Controllers\ServiceCategoryController;
+use App\Http\Controllers\TicketController;
 
 use App\Http\Middleware\LogRequestUrl;
 
@@ -32,6 +33,8 @@ Route::domain(config('app.api_domain'))->group(function () {
 
     Route::group(['middleware' => 'UserAuth', 'prefix' => '/user'], function () {
         Route::post('/save_fcm_token', [UserController::class, "saveFcmToken"]);
+        Route::get('', [UserController::class, "getProfile"]);
+        Route::get('change_password', [UserController::class, "changePassword"]);
     });
 
     Route::group(['middleware' => 'UserAuth', 'prefix' => '/auth'], function () {
@@ -45,6 +48,14 @@ Route::domain(config('app.api_domain'))->group(function () {
 
     Route::group(['middleware' => 'UserAuth', 'prefix' => '/service_categories'], function () {
         Route::get("", [ServiceCategoryController::class, "categories"]);
+    });
+
+
+    Route::group(['middleware' => 'UserAuth', 'prefix' => '/tickets'], function () {
+        Route::post("", [TicketController::class, "create"]);
+        Route::get("", [TicketController::class, "tickets"]);
+        Route::get("/{ticketId}", [TicketController::class, "ticket"]);
+        Route::post("/send_message/{ticketId}", [TicketController::class, "sendMessage"]);
     });
 
     // Route::group(['prefix' => '/users'], function () {
