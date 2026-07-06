@@ -18,21 +18,18 @@ use App\Utilities;
 
 class TicketController extends Controller
 {
-    public function __construct(protected TicketService $ticketService)
-    {
-    }
+    public function __construct(protected TicketService $ticketService) {}
 
     public function create(CreateTicket $request)
     {
-        try{
+        try {
             $data = $request->validated();
             $data['userId'] = Auth::user()->id;
 
             $ticket = $this->ticketService->save($data);
 
             return Utilities::ok(new TicketResource($ticket));
-
-        }catch (AppException $e) {
+        } catch (AppException $e) {
             throw $e;
         } catch (\Exception $e) {
             return Utilities::error($e, "An error occurred while attempting to create Ticket");
@@ -42,9 +39,14 @@ class TicketController extends Controller
     public function tickets(Request $request)
     {
         $resolved = $request->query('resolved', null);
-
-        if($resolved == true) $this->ticketService->resolved = true;
-        if($resolved == false) $this->ticketService->inProgress = true;
+        if ($request->has('resolved')) {
+            $resolved = $request->boolean('resolved');
+            if ($resolved) {
+                $this->ticketService->resolved = true;
+            } else {
+                $this->ticketService->inProgress = true;
+            }
+        }
 
         $this->ticketService->userId = Auth::user()->id;
         $tickets = $this->ticketService->getTickets();
@@ -55,19 +57,21 @@ class TicketController extends Controller
     public function ticket(int $ticketId)
     {
         $ticket = $this->ticketService->getTicket($ticketId, ['messages']);
-        if(!$ticket) return Utilities::error402("Ticket not found");
+        if (!$ticket) return Utilities::error402("Ticket not found");
+
+        if ($ticket->user_id != Auth::user()->id) return Utilities::error402("You are not authorized to access this ticket");
 
         return Utilities::ok(new TicketResource($ticket));
     }
 
     public function sendMessage(SaveTicketMessage $request, int $ticketId)
     {
-        try{
+        try {
             $data = $request->validated();
-            $this->ticketService->sendMessage($data, $ticketId);
-            
+            $this->ticketService->sendMessage($data, $ticketId, Auth::user()->id);
+
             return Utilities::okay("Message sent Successfully");
-        }catch (AppException $e) {
+        } catch (AppException $e) {
             throw $e;
         } catch (\Exception $e) {
             return Utilities::error($e, "An error occurred while attempting to create Ticket");

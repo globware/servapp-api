@@ -24,7 +24,6 @@ class CreateTicket extends BaseRequest
     public function rules(): array
     {
         return [
-            "userId" => "required|integer|exists:users,id",
             "title" => "required|string",
             "content" => "required|string"
         ];
