@@ -25,7 +25,8 @@ class TicketResource extends JsonResource
             "resolved" => $this->resolved,
             "user" => new UserResource($this->user),
             "resolvedBy" => new AdminResource($this->resolvedBy),
-            "messages" => TicketMessageResource::collection($this->whenLoaded("messages"))
+            "messages" => TicketMessageResource::collection($this->whenLoaded("messages")),
+            "createdAt" => $this->created_at
         ];
     }
 }
