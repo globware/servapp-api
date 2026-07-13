@@ -130,7 +130,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function complaints()
     {
-        return $this->hasMany(Complaint::class, "complainer_id", "id");
+        return $this->hasMany(Complaint::class, "user_id", "id");
     }
 
     public function complaintTargets()
@@ -138,19 +138,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Complaint::class, "target_id", "id");
     }
 
-    public function serviceRatings()
+    public function feedbacks()
     {
-        return $this->hasMany(ServiceRating::class);
-    }
-
-    public function serviceReviews()
-    {
-        return $this->hasMany(ServiceReview::class);
+        return $this->hasMany(UserFeedback::class);
     }
 
     public function servicePatronizers()
     {
-        return $this->hasMany(ServicePatronizer::class);
+        return $this->hasMany(Patronizer::class);
     }
 
     public function notifications()
@@ -201,12 +196,8 @@ class User extends Authenticatable implements JWTSubject
                 }
             }
 
-            if($user->serviceRatings->count() > 0) {
-                foreach($user->serviceRatings as $rating) $rating->delete();
-            }
-
-            if($user->serviceReviews->count() > 0) {
-                foreach($user->serviceReviews as $review) $review->delete();
+            if($user->feedbacks->count() > 0) {
+                foreach($user->feedbacks as $feedback) $feedback->delete();
             }
 
             if($user->servicePatronizers->count() > 0) {

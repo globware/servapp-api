@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 use App\Helpers;
 
@@ -193,7 +194,14 @@ class UserService extends Model
 
     public function complaints()
     {
-        return $this->morphMany(Complaint::class, "target");
+        return $this->hasManyThrough(
+            Complaint::class,
+            UserServiceRequest::class,
+            'user_service_id',  // FK on user_service_requests
+            'target_id',        // FK on complaints
+            'id',               // local key on user_services
+            'id'                // local key on user_service_requests
+        )->where('complaints.target_type', UserServiceRequest::$type);
     }
 
     public function openComplaints()

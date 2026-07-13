@@ -129,11 +129,25 @@
                 <div class="space-y-4">
                     @forelse($service->complaints ?? [] as $complaint)
                         <div class="p-5 rounded-3xl bg-slate-50 border border-slate-100">
-                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-black text-slate-900">{{ $complaint->user->fullname ?? 'Anonymous' }}</span>
+                             <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3 pb-3 border-b border-gray-150/50">
+                                <div>
+                                    <span class="text-xs font-black text-slate-900">{{ $complaint->complainer->name ?? 'Anonymous' }}</span>
+                                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider ml-1.5">
+                                        @if($complaint->target && $complaint->user_id == $complaint->target->user_id)
+                                            (Client)
+                                        @else
+                                            (Provider)
+                                        @endif
+                                    </span>
+                                    @if($complaint->accused())
+                                        <span class="text-[10px] text-slate-400 font-bold px-1.5">&rarr;</span>
+                                        <span class="text-xs font-bold text-slate-600">Accused: {{ $complaint->accused()->name }}</span>
+                                    @endif
+                                </div>
                                 <span class="text-[10px] text-slate-400 font-bold">{{ $complaint->created_at->diffForHumans() }}</span>
                              </div>
-                             <p class="text-xs text-slate-600 leading-relaxed font-medium">{{ $complaint->reason }}</p>
+                             <h4 class="text-xs font-bold text-slate-800 mb-1">{{ $complaint->title }}</h4>
+                             <p class="text-xs text-slate-600 leading-relaxed font-medium">{{ $complaint->content }}</p>
                         </div>
                     @empty
                         <div class="py-6 flex flex-col items-center justify-center text-slate-300">

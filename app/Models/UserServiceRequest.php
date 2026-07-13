@@ -35,12 +35,21 @@ class UserServiceRequest extends Model
         );
     }
 
+    public function complaints()
+    {
+        return $this->morphMany(Complaint::class, "target");
+    }
+
     protected static function booted()
     {
         parent::boot();
 
         static::deleting(function (UserServiceRequest $request) {
-            //
+            if ($request->complaints->count() > 0) {
+                foreach ($request->complaints as $complaint) {
+                    $complaint->delete();
+                }
+            }
         });
     }
 }

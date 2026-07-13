@@ -12,6 +12,7 @@ use App\Http\Requests\Provider\Complain;
 
 use App\Services\ComplaintService;
 use App\Services\UserServiceService;
+use App\Services\ServiceRequestService;
 
 use App\Models\UserService;
 use App\Models\User;
@@ -20,39 +21,41 @@ use App\Utilities;
 
 class ComplaintController extends Controller
 {
-    protected $complaintService;
-    protected $service;
 
-    public function __construct(ComplaintService $complaintService, UserServiceService $service)
-    {
+    public function __construct(
+        protected ComplaintService $complaintService,
+        protected UserServiceService $service,
+        protected ServiceRequestService $requestService
+    ) {
         $this->complaintService = $complaintService;
         $this->service = $service;
     }
 
     public function save(Complain $request)
     {
-        try{
+        try {
             $data = $request->validated();
 
-            if(Auth::user()->id == $data['userId']) return Utilities::error402("You cannot complain about yourself!");
+            $serviceRequest = $this->requestService->getRequest($data['requestId']);
+            if (!$serviceRequest) return Utilities::error402("The service request does not exist");
 
-            $data['targetId'] = $data['userId'];
-            $data['targetType'] = User::$type;
+            if ($serviceRequest->userService->user_id != Auth::user()->id) {
+                return Utilities::error402("You are not authorized to complain about this request");
+            }
 
-            $data['userId'] = Auth::user()->id;
+            $complaintData = [
+                'userId' => Auth::user()->id,
+                'targetId' => $serviceRequest->id,
+                'targetType' => \App\Models\UserServiceRequest::$type,
+                'referenceId' => $serviceRequest->user_service_id,
+                'referenceType' => \App\Models\UserService::$type,
+                'title' => $data['title'],
+                'content' => $data['content']
+            ];
 
-            $service = $this->service->getService($data['serviceId']);
-            if(!$service) return Utilities::error402("This User Service does not exist");
-
-            if($service->user_id != Auth::user()->id) return Utilities::error402("Wrong service");
-
-            $data['referenceId'] = $data['serviceId'];
-            $data['referenceType'] = UserService::$type;
-
-            $this->complaintService->save($data);
+            $this->complaintService->save($complaintData);
 
             return Utilities::okay("Complaint has been received successfully");
-            
         } catch (AppException $e) {
             throw $e;
         }

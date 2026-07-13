@@ -23,7 +23,7 @@ class Complain extends BaseRequest
     public function rules(): array
     {
         return [
-            "serviceId" => "required|integer",
+            "requestId" => "required|integer|exists:user_service_requests,id",
             "title" => "required|string",
             "content" => "required|string"
         ];

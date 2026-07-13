@@ -15,7 +15,7 @@ use App\Http\Middleware\LogRequestUrl;
 
 Route::domain(config('app.api_domain'))->group(function () {
     // dd('api route '.config('app.api_domain'));
-    
+
 
     Route::group(['prefix' => '/auth'], function () {
         Route::post('/login', [AuthController::class, "login"]);
@@ -34,7 +34,7 @@ Route::domain(config('app.api_domain'))->group(function () {
     Route::group(['middleware' => 'UserAuth', 'prefix' => '/user'], function () {
         Route::post('/save_fcm_token', [UserController::class, "saveFcmToken"]);
         Route::get('', [UserController::class, "getProfile"]);
-        Route::get('change_password', [UserController::class, "changePassword"]);
+        Route::post('change_password', [UserController::class, "changePassword"]);
     });
 
     Route::group(['middleware' => 'UserAuth', 'prefix' => '/auth'], function () {

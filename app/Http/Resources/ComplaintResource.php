@@ -8,10 +8,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UserProductResource;
 use App\Http\Resources\UserServiceResource;
+use App\Http\Resources\ServiceRequestResource;
 
 use App\Models\User;
 use App\Models\UserService;
 use App\Models\UserProduct;
+use App\Models\UserServiceRequest;
 
 class ComplaintResource extends JsonResource
 {
@@ -40,6 +42,7 @@ class ComplaintResource extends JsonResource
             case User::$type : return new UserResource($this->target); break;
             case UserService::$type : return new UserServiceResource($this->target); break;
             case UserProduct::$type : return new UserProductResource($this->target); break;
+            case UserServiceRequest::$type : return new ServiceRequestResource($this->target); break;
             default : return null;
         }
     }

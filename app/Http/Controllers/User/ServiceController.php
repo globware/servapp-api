@@ -22,6 +22,7 @@ use App\Services\ServiceRequestService;
 use App\Services\ComplaintService;
 
 use App\Models\UserService;
+use App\Models\UserServiceRequest;
 use App\Models\User;
 
 use App\Utilities;
@@ -34,10 +35,13 @@ class ServiceController extends Controller
     protected $requestService;
     protected $complaintService;
 
-    public function __construct(ServiceService $serviceService, UserServiceService $userServiceService, MessageService $messageService, 
-                                    ServiceRequestService $requestService, ComplaintService $complaintService
-                                )
-    {
+    public function __construct(
+        ServiceService $serviceService,
+        UserServiceService $userServiceService,
+        MessageService $messageService,
+        ServiceRequestService $requestService,
+        ComplaintService $complaintService
+    ) {
         $this->serviceService = $serviceService;
         $this->userServiceService = $userServiceService;
         $this->messageService = $messageService;
@@ -53,7 +57,6 @@ class ServiceController extends Controller
         $services = $this->serviceService->getServices(['userServices']);
 
         return Utilities::ok(ServiceResource::collection($services));
-        
     }
 
     public function getServicesByLocation(Request $request)
@@ -64,20 +67,19 @@ class ServiceController extends Controller
         $this->serviceService->limit = 5;
         $this->serviceService->approved = true;
         $services = collect([]);
-        if($long && $lat) {
+        if ($long && $lat) {
             $services = $this->serviceService->getByGps($long, $lat);
         }
 
-        if($services->count() == 0) {
+        if ($services->count() == 0) {
             $services = $this->serviceService->getByLocation(Auth::user()->location_id);
 
-            if($services->count() == 0) {
+            if ($services->count() == 0) {
                 $services = $this->serviceService->getServices();
             }
         }
 
         return Utilities::ok(ServiceResource::collection($services));
-        
     }
 
     public function getService(Request $request, $serviceId)
@@ -85,7 +87,7 @@ class ServiceController extends Controller
         $service = $this->serviceService->getService($serviceId, [
             'userServices' => fn($query) => $query->where('approved', true)->with(['service', 'media', 'tags', 'feedbacks'])
         ]);
-        if(!$service) return Utilities::error402("Service not found");
+        if (!$service) return Utilities::error402("Service not found");
 
         return Utilities::ok(new ServiceResource($service));
     }
@@ -94,7 +96,7 @@ class ServiceController extends Controller
     {
         $this->userServiceService->count = ['requests'];
         $userService = $this->userServiceService->getService($serviceId, ['service', 'media', 'tags', 'feedbacks']);
-        if(!$userService) return Utilities::error402("Service not found");
+        if (!$userService) return Utilities::error402("Service not found");
 
         $requests = $this->requestService->getUserRequests(Auth::user()->id, ['service']);
 
@@ -106,7 +108,7 @@ class ServiceController extends Controller
         $this->userServiceService->paginated = true;
         $this->userServiceService->page = (int) $request->query('page', 1);
         $this->userServiceService->limit = (int) $request->query('perPage', env('PAGINATION_PER_PAGE', 10));
-        
+
         $services = $this->userServiceService->getServices(['service', 'country', 'state', 'location', 'media']);
 
         $meta = [
@@ -121,13 +123,13 @@ class ServiceController extends Controller
 
     public function sendMessage(SendMessage $request)
     {
-        try{
+        try {
             $data = $request->validated();
 
             $userService = $this->userServiceService->getService($data['receiverId']);
-            if(!$userService) return Utilities::error402("This User Service does not exist");
+            if (!$userService) return Utilities::error402("This User Service does not exist");
 
-            if($userService->user_id == Auth::user()->id) return Utilities::error402("You cannot message yourself");
+            if ($userService->user_id == Auth::user()->id) return Utilities::error402("You cannot message yourself");
 
             $data['receiverType'] = UserService::$type;
             $data['senderId'] = Auth::user()->id;
@@ -143,9 +145,9 @@ class ServiceController extends Controller
 
     public function readMessage($serviceId)
     {
-        try{
+        try {
             $userService = $this->userServiceService->getService($serviceId);
-            if(!$userService) return Utilities::error402("This User Service does not exist");
+            if (!$userService) return Utilities::error402("This User Service does not exist");
 
             $this->messageService->read = false;
             $this->messageService->markAsRead($userService, UserService::class);
@@ -158,20 +160,29 @@ class ServiceController extends Controller
 
     public function complain(Complain $request)
     {
-        try{
+        try {
             $data = $request->validated();
-            $data['userId'] = Auth::user()->id;
 
-            $service = $this->userServiceService->getService($data['serviceId']);
-            if(!$service) return Utilities::error402("The target User Service does not exist");
+            $serviceRequest = $this->requestService->getRequest($data['requestId']);
+            if (!$serviceRequest) return Utilities::error402("The service request does not exist");
 
-            $data['targetId'] = $data['serviceId'];
-            $data['targetType'] = UserService::$type;
+            if ($serviceRequest->user_id != Auth::user()->id) {
+                return Utilities::error402("You are not authorized to complain about this request");
+            }
 
-            $this->complaintService->save($data);
+            $complaintData = [
+                'userId' => Auth::user()->id,
+                'targetId' => $serviceRequest->id,
+                'targetType' => UserServiceRequest::$type,
+                'referenceId' => $serviceRequest->user_service_id,
+                'referenceType' => UserService::$type,
+                'title' => $data['title'],
+                'content' => $data['content']
+            ];
+
+            $this->complaintService->save($complaintData);
 
             return Utilities::okay("Complaint has been received successfully");
-            
         } catch (AppException $e) {
             throw $e;
         }

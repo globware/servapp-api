@@ -18,6 +18,16 @@ class ComplaintService
     public function save($data)
     {
         try{
+            $alreadyComplained = Complaint::where('user_id', $data['userId'])
+                ->where('target_id', $data['targetId'])
+                ->where('target_type', $data['targetType'])
+                ->exists();
+
+            if ($alreadyComplained) {
+                $itemType = $data['targetType'] === 'App\Models\UserServiceRequest' ? 'request' : 'item';
+                throw new AppException(402, "You have already raised a complaint for this {$itemType}");
+            }
+
             $complaint = new Complaint; 
             $complaint->user_id = $data['userId'];
             $complaint->target_id = $data['targetId'];

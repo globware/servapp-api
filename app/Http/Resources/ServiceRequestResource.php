@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UserServiceResource;
@@ -50,6 +51,7 @@ class ServiceRequestResource extends JsonResource
             "user" => new UserResource($this->whenLoaded('user')),
             "service" => new UserServiceResource($this->whenLoaded("userService")),
             "chats" => ChatResource::collection($this->chats),
+            "hasComplained" => $this->complaints()->where("user_id", Auth::user()->id)->exists(),
             "requestedAt" => $this->created_at
         ];
 
