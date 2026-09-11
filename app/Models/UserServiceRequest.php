@@ -20,7 +20,7 @@ class UserServiceRequest extends Model
 
     public function chats()
     {
-        return $this->hasMany(Chat::class, 'user_service_request_id', 'id')->orderBy("created_at", "DESC");
+        return $this->morphMany(Chat::class, 'requestable')->orderBy("created_at", "DESC");
     }
 
     public function service()

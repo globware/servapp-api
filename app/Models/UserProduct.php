@@ -3,10 +3,27 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class UserProduct extends Model
 {
+    use Searchable;
+
     public static $type = "App\Models\UserProduct";
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name, // Assuming it has name, will verify schema later
+            'description' => $this->description,
+            'address' => $this->address,
+            'is_unclaimed' => false,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'active' => $this->active ?? true,
+        ];
+    }
 
     public function getType()
     {

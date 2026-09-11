@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Chat extends Model
 {
-    public function request()
+    public function requestable()
     {
-        return $this->belongsTo(UserServiceRequest::class, "user_service_request_id", "id");
+        return $this->morphTo();
     }
 
     public function sender()

@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Laravel\Scout\Searchable;
 
 use App\Helpers;
 
 class UserService extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
     
     public static $type = "App\Models\UserService";
     // public $type = "App\Models\UserService";
@@ -24,6 +25,21 @@ class UserService extends Model
     {
         return [
             'phone_numbers' => 'array',
+        ];
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'address' => $this->address,
+            'service_name' => $this->service ? $this->service->name : null,
+            'is_unclaimed' => false,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'active' => $this->active,
         ];
     }
 
