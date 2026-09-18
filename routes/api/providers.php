@@ -10,6 +10,10 @@ use App\Http\Controllers\Provider\ComplaintController;
 
 use App\Http\Controllers\UtilityController;
 
+use App\Http\Controllers\Provider\ProductController;
+use App\Http\Controllers\Provider\ProductRequestController;
+use App\Http\Controllers\Provider\ClaimController;
+
 Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' => 'Provider',], function () {
     Route::group(['prefix' => '/services'], function () {
         Route::group(['prefix' => '/requests'], function () {
@@ -50,4 +54,25 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
             Route::post("/save", [ComplaintController::class, "save"]);
         });
     });
+
+    // MVP Product Routes
+    Route::group(['prefix' => '/products'], function () {
+        Route::get("", [ProductController::class, "index"]);
+        Route::post("", [ProductController::class, "store"]);
+        Route::patch("/{id}", [ProductController::class, "update"])->middleware('NumericParam:id');
+        Route::delete("/{id}", [ProductController::class, "destroy"])->middleware('NumericParam:id');
+    });
+
+    Route::group(['prefix' => '/product_requests'], function () {
+        Route::get("", [ProductRequestController::class, "index"]);
+        Route::get("/{id}", [ProductRequestController::class, "show"])->middleware('NumericParam:id');
+        Route::patch("/{id}/accept", [ProductRequestController::class, "accept"])->middleware('NumericParam:id');
+        Route::patch("/{id}/decline", [ProductRequestController::class, "decline"])->middleware('NumericParam:id');
+        Route::patch("/{id}/fulfill", [ProductRequestController::class, "fulfill"])->middleware('NumericParam:id');
+        Route::get("/{id}/chats", [ProductRequestController::class, "getChats"])->middleware('NumericParam:id');
+        Route::post("/{id}/chats", [ProductRequestController::class, "sendMessage"])->middleware('NumericParam:id');
+    });
+
+    // MVP Claiming Engine
+    Route::post('/claim/{leadId}', [ClaimController::class, 'claim'])->middleware('NumericParam:leadId');
 });

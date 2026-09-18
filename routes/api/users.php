@@ -11,6 +11,10 @@ use App\Http\Controllers\User\ServiceRequestController;
 
 use App\Http\Controllers\UtilityController;
 
+use App\Http\Controllers\User\ProductController;
+use App\Http\Controllers\User\ProductRequestController;
+use App\Http\Controllers\User\ScoutController;
+
 Route::group(['middleware' => 'UserAuth', 'prefix' => '/user', 'namespace' => 'User',], function () {
     Route::get("/dashboard", [IndexController::class, "dashboard"]);
     Route::get("/logged_in_user", [IndexController::class, "loggedInUser"]);
@@ -44,4 +48,21 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/user', 'namespace' => 'U
     Route::group(['prefix' => '/messages'], function () {
         Route::get("/conversations", [MessageController::class, "conversations"]);
     });
+
+    // MVP Product Routes
+    Route::group(['prefix' => '/products'], function () {
+        Route::get("", [ProductController::class, "index"]);
+        Route::get("/{id}", [ProductController::class, "show"])->middleware('NumericParam:id');
+    });
+
+    Route::group(['prefix' => '/product_requests'], function () {
+        Route::post("", [ProductRequestController::class, "store"]);
+        Route::get("", [ProductRequestController::class, "index"]);
+        Route::get("/{id}", [ProductRequestController::class, "show"])->middleware('NumericParam:id');
+        Route::get("/{id}/chats", [ProductRequestController::class, "getChats"])->middleware('NumericParam:id');
+        Route::post("/{id}/chats", [ProductRequestController::class, "sendMessage"])->middleware('NumericParam:id');
+    });
+
+    // MVP Scouting Engine
+    Route::post('/scout/suggest', [ScoutController::class, 'suggest']);
 });
