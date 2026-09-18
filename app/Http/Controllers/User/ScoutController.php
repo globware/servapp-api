@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\User\SuggestLeadRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ScoutService;
 use App\Http\Resources\UnclaimedLeadResource;
@@ -15,17 +16,9 @@ class ScoutController extends Controller
     {
     }
 
-    public function suggest(Request $request)
+    public function suggest(SuggestLeadRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'lead_type' => 'required|in:service,product',
-            'category_text' => 'nullable|string',
-            'address' => 'required|string',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-        ]);
+        $validated = $request->validated();
 
         try {
             $lead = $this->scoutService->suggestLead($validated, Auth::id());

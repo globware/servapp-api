@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\User\SendProductMessageRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\UserProductRequest;
 use App\Models\UserProduct;
@@ -16,12 +17,9 @@ class ProductRequestController extends Controller
     /**
      * Start a new product inquiry. This automatically spins up a Chat thread.
      */
-    public function store(Request $request)
+    public function store(SendProductMessageRequest $request)
     {
-        $validated = $request->validate([
-            'user_product_id' => 'required|exists:user_products,id',
-            'message' => 'required|string'
-        ]);
+        $validated = $request->validated();
 
         $product = UserProduct::find($validated['user_product_id']);
 
@@ -64,9 +62,9 @@ class ProductRequestController extends Controller
         return Utilities::ok($request);
     }
 
-    public function sendMessage(Request $request, $requestId)
+    public function sendMessage(SendProductMessageRequest $request, $requestId)
     {
-        $validated = $request->validate(['message' => 'required|string']);
+        $validated = $request->validated();
         
         $inquiry = UserProductRequest::where('user_id', Auth::id())->find($requestId);
         if (!$inquiry) return Utilities::error402("Request not found");

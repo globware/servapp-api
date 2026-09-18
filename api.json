@@ -7138,7 +7138,18 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "properties": []
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "nullable": false,
+                                        "format": "string"
+                                    },
+                                    "user_product_id": {
+                                        "type": "object",
+                                        "nullable": false,
+                                        "format": "object"
+                                    }
+                                }
                             }
                         }
                     }
@@ -7950,7 +7961,18 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "properties": []
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "nullable": false,
+                                        "format": "string"
+                                    },
+                                    "user_product_id": {
+                                        "type": "object",
+                                        "nullable": false,
+                                        "format": "object"
+                                    }
+                                }
                             }
                         }
                     }
@@ -8069,7 +8091,43 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "properties": []
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "nullable": false,
+                                        "format": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "format": "string"
+                                    },
+                                    "lead_type": {
+                                        "type": "object",
+                                        "nullable": false,
+                                        "format": "object"
+                                    },
+                                    "category_text": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "format": "string"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "nullable": false,
+                                        "format": "string"
+                                    },
+                                    "latitude": {
+                                        "type": "object",
+                                        "nullable": false,
+                                        "format": "object"
+                                    },
+                                    "longitude": {
+                                        "type": "object",
+                                        "nullable": false,
+                                        "format": "object"
+                                    }
+                                }
                             }
                         }
                     }
@@ -12391,7 +12449,43 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "properties": []
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": false,
+                                        "format": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "format": "string"
+                                    },
+                                    "price": {
+                                        "type": "object",
+                                        "nullable": true,
+                                        "format": "object"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "format": "string"
+                                    },
+                                    "latitude": {
+                                        "type": "object",
+                                        "nullable": true,
+                                        "format": "object"
+                                    },
+                                    "longitude": {
+                                        "type": "object",
+                                        "nullable": true,
+                                        "format": "object"
+                                    },
+                                    "product_id": {
+                                        "type": "object",
+                                        "nullable": false,
+                                        "format": "object"
+                                    }
+                                }
                             }
                         }
                     }
@@ -13798,7 +13892,13 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "properties": []
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "nullable": false,
+                                        "format": "string"
+                                    }
+                                }
                             }
                         }
                     }

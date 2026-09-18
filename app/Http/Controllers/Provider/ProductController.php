@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\Provider\StoreProductRequest;
+use App\Http\Requests\Provider\UpdateProductRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\UserProduct;
 use App\Models\UnclaimedLead;
@@ -24,17 +26,9 @@ class ProductController extends Controller
         return Utilities::ok(UserProductResource::collection($products));
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'nullable|numeric',
-            'address' => 'nullable|string',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'product_id' => 'required|exists:products,id' 
-        ]);
+        $validated = $request->validated();
 
         try {
             $product = $this->productService->save($validated, Auth::id());
@@ -48,17 +42,9 @@ class ProductController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateProductRequest $request, $id)
     {
-        $validated = $request->validate([
-            'name' => 'string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'nullable|numeric',
-            'address' => 'nullable|string',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'active' => 'boolean'
-        ]);
+        $validated = $request->validated();
 
         try {
             $product = $this->productService->update($id, $validated, Auth::id());

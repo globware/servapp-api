@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\Provider\SendProductMessageRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\UserProductRequest;
 use App\Models\UserProduct;
@@ -75,9 +76,9 @@ class ProductRequestController extends Controller
         return Utilities::ok($request);
     }
 
-    public function sendMessage(Request $request, $requestId)
+    public function sendMessage(SendProductMessageRequest $request, $requestId)
     {
-        $validated = $request->validate(['message' => 'required|string']);
+        $validated = $request->validated();
         
         $inquiry = UserProductRequest::whereHas('userProduct', function($query) {
             $query->where('user_id', Auth::id());
