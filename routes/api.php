@@ -32,7 +32,7 @@ Route::domain(config('app.api_domain'))->group(function () {
     });
 
     Route::group(['middleware' => 'UserAuth', 'prefix' => '/user'], function () {
-        Route::post('/save_fcm_token', [UserController::class, "saveFcmToken"]);
+        Route::post('/save_fcm_token', [UserController::class, "saveFCMToken"]);
         Route::get('', [UserController::class, "getProfile"]);
         Route::post('change_password', [UserController::class, "changePassword"]);
     });

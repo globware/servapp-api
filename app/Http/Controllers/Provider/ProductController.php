@@ -20,12 +20,22 @@ class ProductController extends Controller
     {
     }
 
+
+
+    /**
+     * @return array{status: boolean, message: string, data: array<\App\Http\Resources\UserProductResource>}
+     */
     public function index(Request $request)
     {
         $products = $this->productService->getProviderProducts(Auth::id());
         return Utilities::ok(UserProductResource::collection($products));
     }
 
+
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductResource}
+     */
     public function store(StoreProductRequest $request)
     {
         $validated = $request->validated();
@@ -42,6 +52,11 @@ class ProductController extends Controller
         }
     }
 
+
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductResource}
+     */
     public function update(UpdateProductRequest $request, $id)
     {
         $validated = $request->validated();

@@ -18,29 +18,21 @@ use App\Http\Resources\ChatResource;
 
 class UserProductResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
             "id" => $this->id,
             "name" => $this->name,
-            "rating" => $this->rating,
-            "verified" => $this->verified,
-            "suspended" => $this->suspended,
+            "description" => $this->description,
+            "price" => $this->price,
+            "address" => $this->address,
+            "latitude" => $this->latitude,
+            "longitude" => $this->longitude,
+            "active" => $this->active,
+            "is_unclaimed" => false, // Distinguish from unclaimed leads
             "user" => new UserResource($this->whenLoaded("user")),
-            "service" => new ServiceResource($this->whenLoaded("service")),
-            "country" => new CountryResource($this->whenLoaded("country")),
-            "state" => new StateResource($this->whenLoaded("state")),
-            "location" => new LocationResource($this->whenLoaded("location")),
             "media" => FileResource::collection($this->whenLoaded("media")),
-            "documents" => FileResource::collection($this->whenLoaded("documents")),
-            "requests" => ServiceRequestResource::collection($this->whenLoaded("requests")),
-            "reviews" => ServiceReviewResource::collection($this->whenLoaded("reviews")),
-            "patronizers" => ServicePatronizerResource::collection($this->whenLoaded("patronizers")),
+            "requests" => UserProductRequestResource::collection($this->whenLoaded("requests")),
             "chats" => ChatResource::collection($this->whenLoaded("chats"))
         ];
     }

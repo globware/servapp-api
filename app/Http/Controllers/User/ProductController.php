@@ -4,69 +4,46 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\UserProduct;
-use App\Models\UnclaimedLead;
+use App\Services\UserProductService;
+use App\Http\Resources\UserProductResource;
+use App\Http\Resources\UnclaimedLeadResource;
 use App\Utilities;
 
 class ProductController extends Controller
 {
+    public function __construct(protected UserProductService $productService)
+    {
+    }
+
+
     /**
-     * Fetch products and unclaimed product leads using Meilisearch.
+     * @return array{status: boolean, message: string, data: array<\App\Http\Resources\UserProductResource>}
      */
     public function index(Request $request)
     {
-        $query = $request->input('query', '');
-        
-        // 1. Search verified active products
-        $products = UserProduct::search($query)
-            ->where('active', true)
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'title' => $product->name,
-                    'description' => $product->description,
-                    'address' => $product->address,
-                    'latitude' => $product->latitude,
-                    'longitude' => $product->longitude,
-                    'price' => $product->price,
-                    'is_unclaimed' => false,
-                    'type' => 'product'
-                ];
-            });
+        $query = $request->query('query', '');
+        $results = $this->productService->searchProductsAndLeads($query);
 
-        // 2. Search unclaimed product leads
-        $unclaimedLeads = UnclaimedLead::search($query)
-            ->where('lead_type', 'product')
-            ->where('active', true) // active = true means approved & unclaimed in our Scout config
-            ->get()
-            ->map(function ($lead) {
-                return [
-                    'id' => $lead->id,
-                    'title' => $lead->title,
-                    'description' => $lead->description,
-                    'address' => $lead->address,
-                    'latitude' => $lead->latitude,
-                    'longitude' => $lead->longitude,
-                    'price' => null,
-                    'is_unclaimed' => true,
-                    'type' => 'product_lead'
-                ];
-            });
+        $merged = collect();
+        foreach ($results['products'] as $product) {
+            $merged->push(new UserProductResource($product));
+        }
+        foreach ($results['leads'] as $lead) {
+            $merged->push(new UnclaimedLeadResource($lead));
+        }
 
-        // 3. Merge and return
-        $combinedResults = $products->merge($unclaimedLeads);
-
-        return Utilities::ok($combinedResults);
+        return Utilities::ok($merged->values());
     }
-    
+
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductResource}
+     */
     public function show($id)
     {
-        $product = UserProduct::find($id);
-        if (!$product) {
-            return Utilities::error402("Product not found");
-        }
-        
-        return Utilities::ok($product);
+        $product = $this->productService->getProduct($id);
+        if (!$product) return Utilities::error402("Product not found");
+
+        return Utilities::ok(new UserProductResource($product));
     }
 }

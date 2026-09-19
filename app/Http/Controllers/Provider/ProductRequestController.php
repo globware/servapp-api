@@ -3,118 +3,115 @@
 namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Requests\Provider\SendProductMessageRequest;
 use Illuminate\Support\Facades\Auth;
-use App\Models\UserProductRequest;
-use App\Models\UserProduct;
-use App\Models\Chat;
-use App\Models\User;
+use App\Services\UserProductRequestService;
+use App\Http\Resources\UserProductRequestResource;
+use App\Http\Requests\Provider\SendProductMessageRequest;
+use App\Http\Resources\ChatResource;
 use App\Utilities;
 
 class ProductRequestController extends Controller
 {
+    public function __construct(protected UserProductRequestService $requestService)
+    {
+    }
+
+
+
+    /**
+     * @return array{status: boolean, message: string, data: array<\App\Http\Resources\UserProductRequestResource>}
+     */
     public function index()
     {
-        // Get all requests for products owned by this provider
-        $requests = UserProductRequest::whereHas('userProduct', function($query) {
-            $query->where('user_id', Auth::id());
-        })->with('userProduct', 'user')->get();
-
-        return Utilities::ok($requests);
+        $requests = $this->requestService->getProviderRequests(Auth::id());
+        return Utilities::ok(UserProductRequestResource::collection($requests));
     }
 
+
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductRequestResource}
+     */
     public function show($id)
     {
-        $request = UserProductRequest::whereHas('userProduct', function($query) {
-            $query->where('user_id', Auth::id());
-        })->with('userProduct', 'user')->find($id);
-
-        if (!$request) return Utilities::error402("Request not found or unauthorized");
-        return Utilities::ok($request);
+        $request = $this->requestService->getProviderRequest($id, Auth::id());
+        if (!$request) return Utilities::error402("Request not found");
+        return Utilities::ok(new UserProductRequestResource($request));
     }
 
+
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductRequestResource}
+     */
     public function accept($id)
     {
-        $request = UserProductRequest::whereHas('userProduct', function($query) {
-            $query->where('user_id', Auth::id());
-        })->find($id);
-
-        if (!$request) return Utilities::error402("Request not found");
-
-        $request->Status = 'accepted';
-        $request->save();
-
-        return Utilities::ok($request);
+        try {
+            $request = $this->requestService->changeStatus($id, Auth::id(), 'accepted');
+            return Utilities::ok(new UserProductRequestResource($request));
+        } catch (\Exception $e) {
+            return Utilities::error($e, $e->getMessage());
+        }
     }
 
+
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductRequestResource}
+     */
     public function decline($id)
     {
-        $request = UserProductRequest::whereHas('userProduct', function($query) {
-            $query->where('user_id', Auth::id());
-        })->find($id);
-
-        if (!$request) return Utilities::error402("Request not found");
-
-        $request->Status = 'declined';
-        $request->save();
-
-        return Utilities::ok($request);
+        try {
+            $request = $this->requestService->changeStatus($id, Auth::id(), 'declined');
+            return Utilities::ok(new UserProductRequestResource($request));
+        } catch (\Exception $e) {
+            return Utilities::error($e, $e->getMessage());
+        }
     }
 
+
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductRequestResource}
+     */
     public function fulfill($id)
     {
-        $request = UserProductRequest::whereHas('userProduct', function($query) {
-            $query->where('user_id', Auth::id());
-        })->find($id);
-
-        if (!$request) return Utilities::error402("Request not found");
-
-        $request->Status = 'provider_fulfilled';
-        $request->save();
-
-        return Utilities::ok($request);
+        try {
+            $request = $this->requestService->changeStatus($id, Auth::id(), 'provider_fulfilled');
+            return Utilities::ok(new UserProductRequestResource($request));
+        } catch (\Exception $e) {
+            return Utilities::error($e, $e->getMessage());
+        }
     }
 
+
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\ChatResource}
+     */
     public function sendMessage(SendProductMessageRequest $request, $requestId)
     {
-        $validated = $request->validated();
-        
-        $inquiry = UserProductRequest::whereHas('userProduct', function($query) {
-            $query->where('user_id', Auth::id());
-        })->find($requestId);
-
+        $inquiry = $this->requestService->getProviderRequest($requestId, Auth::id());
         if (!$inquiry) return Utilities::error402("Request not found");
 
-        $chat = new Chat();
-        $chat->requestable_id = $inquiry->id;
-        $chat->requestable_type = UserProductRequest::$type;
-        $chat->sender_id = Auth::id();
-        $chat->sender_type = User::$type; // Assuming Providers act as Users in this context
-        $chat->receiver_id = $inquiry->user_id; // The customer
-        $chat->receiver_type = User::$type;
-        $chat->message = $validated['message'];
-        $chat->save();
-
-        return Utilities::ok($chat);
+        $chat = $this->requestService->sendMessage($inquiry, $request->message, Auth::id(), $inquiry->user_id);
+        return Utilities::ok(new ChatResource($chat));
     }
 
+
+
+    /**
+     * @return array{status: boolean, message: string, data: array{status: string, chats: array<\App\Http\Resources\ChatResource>}}
+     */
     public function getChats($requestId)
     {
-        $inquiry = UserProductRequest::whereHas('userProduct', function($query) {
-            $query->where('user_id', Auth::id());
-        })->find($requestId);
-
+        $inquiry = $this->requestService->getProviderRequest($requestId, Auth::id());
         if (!$inquiry) return Utilities::error402("Request not found");
 
-        $chats = Chat::where('requestable_id', $inquiry->id)
-                     ->where('requestable_type', UserProductRequest::$type)
-                     ->orderBy('created_at', 'asc')
-                     ->get();
-
+        $chats = $this->requestService->getChats($inquiry);
         return Utilities::ok([
             'status' => $inquiry->Status,
-            'chats' => $chats
+            'chats' => ChatResource::collection($chats)
         ]);
     }
 }
