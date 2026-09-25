@@ -140,15 +140,15 @@ return [
         'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
-            'user_products' => [
+            \App\Models\UserProduct::class => [
                 'filterableAttributes' => ['id', 'active', '_geo'],
                 'sortableAttributes' => ['_geo'],
             ],
-            'user_services' => [
+            \App\Models\UserService::class => [
                 'filterableAttributes' => ['id', 'active', 'is_unclaimed', '_geo'],
                 'sortableAttributes' => ['_geo'],
             ],
-            'unclaimed_leads' => [
+            \App\Models\UnclaimedLead::class => [
                 'filterableAttributes' => ['id', 'lead_type', 'status', 'approved', 'is_unclaimed', '_geo'],
                 'sortableAttributes' => ['_geo'],
             ],
