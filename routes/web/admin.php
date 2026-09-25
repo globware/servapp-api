@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\ServiceController;
 
 Route::middleware('guest:web')->group(function () {
@@ -18,6 +19,13 @@ Route::middleware('auth:web')->group(function () {
 
     Route::group(['prefix' => '/users'], function () {
         Route::get('', [DashboardController::class, 'users'])->name('admin.users.index');
+    });
+
+    
+    Route::group(['prefix' => '/leads'], function () {
+        Route::get('', [LeadController::class, 'index'])->name('admin.leads.index');
+        Route::post('{leadId}/approve', [LeadController::class, 'approve'])->name('admin.leads.approve');
+        Route::post('{leadId}/reject', [LeadController::class, 'reject'])->name('admin.leads.reject');
     });
 
     Route::group(['prefix' => '/services'], function () {

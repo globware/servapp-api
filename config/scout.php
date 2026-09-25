@@ -140,15 +140,18 @@ return [
         'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
-            // 'users' => [
-            //     'filterableAttributes' => ['id', 'name', 'email'],
-            //     'embedders' => [
-            //         'default' => [
-            //             'source' => 'userProvided',
-            //             'dimensions' => 1536,
-            //         ],
-            //     ],
-            // ],
+            'user_products' => [
+                'filterableAttributes' => ['id', 'active', '_geo'],
+                'sortableAttributes' => ['_geo'],
+            ],
+            'user_services' => [
+                'filterableAttributes' => ['id', 'active', 'is_unclaimed', '_geo'],
+                'sortableAttributes' => ['_geo'],
+            ],
+            'unclaimed_leads' => [
+                'filterableAttributes' => ['id', 'lead_type', 'status', 'approved', 'is_unclaimed', '_geo'],
+                'sortableAttributes' => ['_geo'],
+            ],
         ],
         'model-settings' => [
             // User::class => [

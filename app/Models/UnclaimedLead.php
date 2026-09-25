@@ -23,7 +23,8 @@ class UnclaimedLead extends Model
             'is_unclaimed' => true,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
-            'active' => ($this->status === 'unclaimed' && $this->approved === true), // only show if approved and unclaimed
+            'status' => $this->status,
+            'approved' => (bool) $this->approved,
         ];
     }
 }

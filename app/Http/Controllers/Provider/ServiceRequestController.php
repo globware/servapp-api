@@ -163,4 +163,41 @@ class ServiceRequestController extends Controller
 
         return Utilities::ok($stats);
     }
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Models\Quote}
+     */
+    public function quote($requestId, \Illuminate\Http\Request $request)
+    {
+        $serviceRequest = \App\Models\UserServiceRequest::where('id', $requestId)
+            ->whereHas('userService', function($q) {
+                $q->where('user_id', \Illuminate\Support\Facades\Auth::id());
+            })->first();
+
+        if (!$serviceRequest) return Utilities::error402("Request not found");
+
+        if (!in_array($serviceRequest->status, ['requested', 'quoted'])) {
+            return Utilities::error402("Cannot quote on a request in this status.");
+        }
+
+        $validated = $request->validate([
+            'amount' => 'required|integer',
+            'currency' => 'nullable|string',
+            'description' => 'nullable|string'
+        ]);
+
+        $quote = \App\Models\Quote::updateOrCreate(
+            ['user_service_request_id' => $requestId],
+            [
+                'amount' => $validated['amount'],
+                'currency' => $validated['currency'] ?? 'NGN',
+                'description' => $validated['description'] ?? null,
+            ]
+        );
+
+        $serviceRequest->status = 'quoted';
+        $serviceRequest->save();
+
+        return Utilities::ok($quote, "Quote submitted successfully");
+    }
 }

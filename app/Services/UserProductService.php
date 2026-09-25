@@ -12,7 +12,7 @@ class UserProductService
     public function searchProductsAndLeads($query)
     {
         $products = UserProduct::search($query)->where('active', true)->get();
-        $leads = UnclaimedLead::search($query)->where('lead_type', 'product')->where('active', true)->get();
+        $leads = UnclaimedLead::search($query)->where('lead_type', 'product')->where('status', 'unclaimed')->where('approved', true)->get();
         
         return [
             'products' => $products,

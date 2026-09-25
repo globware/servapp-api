@@ -40,6 +40,11 @@ class UserServiceRequest extends Model
         return $this->morphMany(Complaint::class, "target");
     }
 
+    public function quote()
+    {
+        return $this->hasOne(Quote::class, 'user_service_request_id');
+    }
+
     protected static function booted()
     {
         parent::boot();

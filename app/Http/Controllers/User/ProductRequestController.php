@@ -84,4 +84,88 @@ class ProductRequestController extends Controller
             'chats' => ChatResource::collection($chats)
         ]);
     }
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductRequestResource}
+     */
+    public function confirm($id)
+    {
+        $request = $this->requestService->getRequest($id);
+        if (!$request || $request->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            return Utilities::error402("Request not found");
+        }
+
+        if ($request->Status !== 'provider_fulfilled') {
+            return Utilities::error402("Request must be marked as fulfilled by provider first.");
+        }
+
+        $request = $this->requestService->changeCustomerStatus($id, \Illuminate\Support\Facades\Auth::id(), 'fulfilled');
+        return Utilities::ok(new UserProductRequestResource($request), "Request confirmed successfully");
+    }
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductRequestResource}
+     */
+    public function cancel($id)
+    {
+        $request = $this->requestService->getRequest($id);
+        if (!$request || $request->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            return Utilities::error402("Request not found");
+        }
+
+        if (in_array($request->Status, ['fulfilled', 'cancelled', 'provider_fulfilled', 'declined'])) {
+            return Utilities::error402("Cannot cancel request in its current state.");
+        }
+
+        $request = $this->requestService->changeCustomerStatus($id, \Illuminate\Support\Facades\Auth::id(), 'cancelled');
+        return Utilities::ok(new UserProductRequestResource($request), "Request cancelled successfully");
+    }
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Models\UserProductReview}
+     */
+    public function review($id, \Illuminate\Http\Request $request)
+    {
+        $req = $this->requestService->getRequest($id);
+        if (!$req || $req->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            return Utilities::error402("Request not found");
+        }
+
+        if ($req->Status !== 'fulfilled') {
+            return Utilities::error402("Only fulfilled requests can be reviewed.");
+        }
+
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'nullable|string'
+        ]);
+
+        $review = \App\Models\UserProductReview::create([
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'user_product_id' => $req->user_product_id,
+            'rating' => $validated['rating'],
+            'review' => $validated['review'] ?? null,
+        ]);
+
+        return Utilities::ok($review, "Review submitted successfully");
+    }
+
+    /**
+     * @return array{status: boolean, message: string, data: array}
+     */
+    public function read($id)
+    {
+        $req = $this->requestService->getRequest($id);
+        if (!$req || $req->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            return Utilities::error402("Request not found");
+        }
+
+        // Standard mark read logic using the polymorph relations
+        \App\Models\Chat::where('requestable_id', $id)
+            ->where('requestable_type', \App\Models\UserProductRequest::class)
+            ->where('receiver_id', \Illuminate\Support\Facades\Auth::id())
+            ->update(['seen' => true]);
+
+        return Utilities::ok([], "Messages marked as read");
+    }
 }

@@ -22,6 +22,11 @@ class Chat extends Model
         return $this->morphTo('receiver');
     }
 
+    public function media()
+    {
+        return $this->belongsToMany(File::class, 'chat_media', 'chat_id', 'file_id');
+    }
+
     protected static function booted()
     {
         parent::boot();

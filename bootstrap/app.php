@@ -68,6 +68,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Add redirect configuration for unauthenticated users
         $middleware->redirectGuestsTo('/login');
+        $middleware->api(append: [\App\Http\Middleware\IdempotencyKeyMiddleware::class]);
         
         $middleware->alias([
             'UserAuth'    => UserAuth::class,

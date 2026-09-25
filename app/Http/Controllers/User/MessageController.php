@@ -5,42 +5,29 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-use App\Exceptions\AppException;
-
-use App\Http\Resources\ConversationResource;
-
-use App\Services\MessageService;
-
-use App\Models\User;
-
+use App\Models\Chat;
+use App\Http\Resources\ChatResource;
 use App\Utilities;
 
 class MessageController extends Controller
 {
-    public $messageService;
-
-    public function __construct(MessageService $messageService)
+    /**
+     * @return array{status: boolean, message: string, data: array<\App\Http\Resources\ChatResource>}
+     */
+    public function conversations()
     {
-        $this->messageService = $messageService;
-    }
+        $userId = Auth::id();
+        
+        $chats = Chat::with(['sender', 'receiver'])
+            ->where('sender_id', $userId)
+            ->orWhere('receiver_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->unique(function ($item) {
+                return $item->requestable_type . '-' . $item->requestable_id;
+            })
+            ->values();
 
-    public function conversations(Request $request)
-    {
-        try {
-            $user = Auth::user();
-            $conversations = $this->messageService->getConversations($user, User::class);
-
-            // Map conversations to resources
-            $conversationResources = array_map(function($conversation) {
-                return new ConversationResource($conversation);
-            }, $conversations);
-
-            return Utilities::ok([
-                'conversations' => $conversationResources
-            ]);
-        } catch (AppException $e) {
-            throw $e;
-        }
+        return Utilities::ok(ChatResource::collection($chats));
     }
 }

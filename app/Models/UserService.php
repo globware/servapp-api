@@ -37,8 +37,7 @@ class UserService extends Model
             'address' => $this->address,
             'service_name' => $this->service ? $this->service->name : null,
             'is_unclaimed' => false,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
+            '_geo' => ['lat' => (float) $this->latitude, 'lng' => (float) $this->longitude],
             'active' => $this->active,
         ];
     }

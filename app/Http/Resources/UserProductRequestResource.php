@@ -11,11 +11,11 @@ class UserProductRequestResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "user_id" => $this->user_id,
-            "user_product_id" => $this->user_product_id,
-            "Status" => $this->Status,
-            "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at,
+            "userId" => $this->user_id,
+            "userProductId" => $this->user_product_id,
+            "status" => $this->Status,
+            "createdAt" => $this->created_at,
+            "updatedAt" => $this->updated_at,
             "user" => new UserResource($this->whenLoaded("user")),
             "product" => new UserProductResource($this->whenLoaded("userProduct")),
             "chats" => ChatResource::collection($this->whenLoaded("chats"))

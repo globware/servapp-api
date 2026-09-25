@@ -23,8 +23,13 @@ class SendChatMessage extends BaseRequest
     public function rules(): array
     {
         return [
-            "requestId" => "required|integer",
-            "message" => "required|string"
+            'message' => 'nullable|string',
+            'requestId' => 'sometimes|integer',
+            'receiverId' => 'sometimes|integer',
+            'mediaIds' => 'nullable|array',
+            'mediaIds.*' => 'integer',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ];
     }
 }

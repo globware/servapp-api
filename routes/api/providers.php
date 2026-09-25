@@ -10,6 +10,7 @@ use App\Http\Controllers\Provider\ComplaintController;
 
 use App\Http\Controllers\UtilityController;
 
+use App\Http\Controllers\Provider\VerificationController;
 use App\Http\Controllers\Provider\ProductController;
 use App\Http\Controllers\Provider\ProductRequestController;
 use App\Http\Controllers\Provider\ClaimController;
@@ -26,6 +27,7 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
             Route::patch("/complete/{requestId}", [ServiceRequestController::class, "completed"])->middleware('NumericParam:requestId');
             Route::patch("/treat_completed/{requestId}", [ServiceRequestController::class, "treatCompleted"])->middleware('NumericParam:requestId');
             Route::get("/{requestId}", [ServiceRequestController::class, "getRequest"])->middleware('NumericParam:requestId');
+            Route::post("/quote/{requestId}", [ServiceRequestController::class, "quote"])->middleware("NumericParam:requestId");
         });
         Route::get("", [ServiceController::class, "services"]);
         Route::post("/add", [ServiceController::class, "save"]);
@@ -56,6 +58,12 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
     });
 
     // MVP Product Routes
+    
+    Route::group(['prefix' => '/verification'], function () {
+        Route::get('', [VerificationController::class, 'status']);
+        Route::post('', [VerificationController::class, 'submit']);
+    });
+
     Route::group(['prefix' => '/products'], function () {
         Route::get("", [ProductController::class, "index"]);
         Route::post("", [ProductController::class, "store"]);
@@ -75,4 +83,5 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
 
     // MVP Claiming Engine
     Route::post('/claim/{leadId}', [ClaimController::class, 'claim'])->middleware('NumericParam:leadId');
+    Route::get('/leads/search', [ClaimController::class, 'search']);
 });

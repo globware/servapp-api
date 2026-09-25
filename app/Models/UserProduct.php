@@ -19,9 +19,11 @@ class UserProduct extends Model
             'description' => $this->description,
             'address' => $this->address,
             'is_unclaimed' => false,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
             'active' => $this->active ?? true,
+            '_geo' => [
+                'lat' => (float) $this->latitude,
+                'lng' => (float) $this->longitude,
+            ],
         ];
     }
 
@@ -32,7 +34,7 @@ class UserProduct extends Model
 
     public function reviews()
     {
-        return $this->morphMany(review::class, 'target');
+        return $this->hasMany(UserProductReview::class);
     }
 
     public function patronizers()

@@ -22,7 +22,13 @@ class SendProductMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'message' => 'required|string',
+            'message' => 'nullable|string',
+            'requestId' => 'sometimes|integer',
+            'receiverId' => 'sometimes|integer',
+            'mediaIds' => 'nullable|array',
+            'mediaIds.*' => 'integer',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ];
     }
 }

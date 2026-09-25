@@ -65,17 +65,26 @@ class UserProductRequestService
         return $request;
     }
 
-    public function sendMessage($inquiry, $messageText, $senderId, $receiverId)
+    public function sendMessage($inquiry, $data, $senderId, $receiverId)
     {
-        $chat = new Chat();
+        if (\App\Models\UserBlock::where('user_id', $senderId)->where('blocked_user_id', $receiverId)->orWhere('user_id', $receiverId)->where('blocked_user_id', $senderId)->exists()) {
+            throw new \App\Exceptions\AppException("Action blocked by user settings.");
+        }
+        $chat = new \App\Models\Chat();
         $chat->requestable_id = $inquiry->id;
-        $chat->requestable_type = UserProductRequest::$type;
+        $chat->requestable_type = \App\Models\UserProductRequest::class;
         $chat->sender_id = $senderId;
-        $chat->sender_type = User::$type;
+        $chat->sender_type = \App\Models\User::class;
         $chat->receiver_id = $receiverId;
-        $chat->receiver_type = User::$type;
-        $chat->message = $messageText;
+        $chat->receiver_type = \App\Models\User::class;
+        $chat->message = $data['message'] ?? null;
+        $chat->latitude = $data['latitude'] ?? null;
+        $chat->longitude = $data['longitude'] ?? null;
         $chat->save();
+
+        if (!empty($data['mediaIds'])) {
+            $chat->media()->sync($data['mediaIds']);
+        }
 
         return $chat;
     }
@@ -86,5 +95,17 @@ class UserProductRequestService
                      ->where('requestable_type', UserProductRequest::$type)
                      ->orderBy('created_at', 'asc')
                      ->get();
+    }
+
+    public function changeCustomerStatus($id, $userId, $status)
+    {
+        $request = $this->getRequest($id);
+        if (!$request || $request->user_id !== $userId) {
+            throw new AppException("Request not found or unauthorized");
+        }
+
+        $request->Status = $status;
+        $request->save();
+        return $request;
     }
 }

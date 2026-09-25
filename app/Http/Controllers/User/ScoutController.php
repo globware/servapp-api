@@ -27,4 +27,16 @@ class ScoutController extends Controller
             return Utilities::error($e, $e->getMessage());
         }
     }
+
+    /**
+     * @return array{status: boolean, message: string, data: array<\App\Http\Resources\UnclaimedLeadResource>}
+     */
+    public function suggestions()
+    {
+        $leads = \App\Models\UnclaimedLead::where('suggested_by', \Illuminate\Support\Facades\Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Utilities::ok(\App\Http\Resources\UnclaimedLeadResource::collection($leads));
+    }
 }

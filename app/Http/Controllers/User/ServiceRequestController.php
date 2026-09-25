@@ -177,4 +177,25 @@ class ServiceRequestController extends Controller
     }
 
     // public function markAsSeen($requestId)
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Models\UserServiceRequest}
+     */
+    public function acceptQuote($requestId)
+    {
+        $serviceRequest = \App\Models\UserServiceRequest::where('id', $requestId)
+            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->first();
+
+        if (!$serviceRequest) return Utilities::error402("Request not found");
+
+        if ($serviceRequest->status !== 'quoted') {
+            return Utilities::error402("Request must be quoted first.");
+        }
+
+        $serviceRequest->status = 'confirmed';
+        $serviceRequest->save();
+
+        return Utilities::ok($serviceRequest, "Quote accepted successfully");
+    }
 }
