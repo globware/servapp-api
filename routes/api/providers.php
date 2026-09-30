@@ -16,6 +16,10 @@ use App\Http\Controllers\Provider\ProductRequestController;
 use App\Http\Controllers\Provider\ClaimController;
 
 Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' => 'Provider',], function () {
+    Route::group(['prefix' => '/messages'], function () {
+        Route::get('/conversations', [MessageController::class, 'globalConversations']);
+    });
+
     Route::group(['prefix' => '/services'], function () {
         Route::group(['prefix' => '/requests'], function () {
             Route::get("", [ServiceRequestController::class, "getRequests"]);
@@ -69,6 +73,9 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
         Route::post("", [ProductController::class, "store"]);
         Route::patch("/{id}", [ProductController::class, "update"])->middleware('NumericParam:id');
         Route::delete("/{id}", [ProductController::class, "destroy"])->middleware('NumericParam:id');
+        Route::post("/save_media", [ProductController::class, "saveMedia"]);
+        Route::delete("/media/{mediaId}", [ProductController::class, "deleteMedia"])->middleware('NumericParam:mediaId');
+        Route::patch("/{id}/add_media", [ProductController::class, "addMedia"])->middleware('NumericParam:id');
     });
 
     Route::group(['prefix' => '/product_requests'], function () {

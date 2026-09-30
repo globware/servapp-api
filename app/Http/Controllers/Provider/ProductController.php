@@ -11,12 +11,14 @@ use App\Models\UserProduct;
 use App\Models\UnclaimedLead;
 use App\Utilities;
 
+use App\Services\FileService;
+use App\Http\Requests\SaveMedia;
 use App\Services\UserProductService;
 use App\Http\Resources\UserProductResource;
 
 class ProductController extends Controller
 {
-    public function __construct(protected UserProductService $productService)
+    public function __construct(protected UserProductService $productService, protected FileService $fileService)
     {
     }
 
@@ -85,5 +87,57 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return Utilities::error($e, $e->getMessage());
         }
+    }
+
+    /**
+     * @return array{status: boolean, message: string, data: array<int>}
+     */
+    public function saveMedia(SaveMedia $request)
+    {
+        try {
+            $fileArr = [];
+            $fileIds = [];
+            foreach ($request->validated("media") as $file) {
+                $fileArr[] = $this->fileService->save($file, 'products');
+            }
+            if (!empty($fileArr)) {
+                foreach ($fileArr as $file) $fileIds[] = $file->id;
+            }
+            return Utilities::ok($fileIds);
+        } catch (\Exception $e) {
+            return Utilities::error($e, "An Error Occurred while attempting to Save Product Media");
+        }
+    }
+
+    /**
+     * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductResource}
+     */
+    public function addMedia(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'mediaIds' => 'required|array',
+            'mediaIds.*' => 'integer'
+        ]);
+
+        $product = $this->productService->getProviderProducts(Auth::id())->where('id', $id)->first();
+        if (!$product) return Utilities::error402("Product not found");
+
+        $product->media()->syncWithoutDetaching($validated['mediaIds']);
+        $product->load('media');
+
+        return Utilities::ok(new UserProductResource($product), "Media added successfully");
+    }
+
+    /**
+     * @return array{status: boolean, message: string, data: array}
+     */
+    public function deleteMedia($id)
+    {
+        $file = $this->fileService->getFile($id);
+        if (!$file) return Utilities::error402("Media not found");
+
+        $this->fileService->delete($file);
+
+        return Utilities::okay("Media deleted Successfully");
     }
 }
