@@ -29,6 +29,8 @@ class StoreProductRequest extends FormRequest
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'product_id' => 'required|exists:products,id',
+            'mediaIds' => 'nullable|array',
+            'mediaIds.*' => 'integer',
         ];
     }
 }

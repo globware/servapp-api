@@ -28,7 +28,9 @@ class UpdateProductRequest extends FormRequest
             'address' => 'nullable|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
-            'active' => 'boolean'
+            'active' => 'boolean',
+            'mediaIds' => 'nullable|array',
+            'mediaIds.*' => 'integer'
         ];
     }
 }
