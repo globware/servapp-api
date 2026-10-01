@@ -14376,6 +14376,16 @@
                                         "type": "object",
                                         "nullable": false,
                                         "format": "object"
+                                    },
+                                    "mediaIds": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "format": "array"
+                                    },
+                                    "mediaIds.*": {
+                                        "type": "integer",
+                                        "nullable": false,
+                                        "format": "integer"
                                     }
                                 }
                             }

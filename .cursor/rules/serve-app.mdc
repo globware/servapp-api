@@ -1,0 +1,47 @@
+---
+alwaysApply: true
+---
+
+# .cursorrules
+PROJECT: Laravel 12+ API with Service Pattern and Inertia.js (Vue 3 Typescript) Admin frontend
+Key Dependencies: 
+- JWT for API auth
+- Inertia.js server-side and client-side
+- Vue 3 Composition API
+- Tailwind CSS for styling
+CODING STYLE:
+- Controllers are thin, only handle HTTP logic
+- Business logic goes in Service classes
+- Use Dependency Injection for services
+- Return JSON responses which is defined in the App\Utilities::Ok method
+- Return Inertia responses for the Admin Inertia which is defined in the App\Utilities::InertiaOk method
+- Use Laravel Resources for API responses
+- Use Validation Request Class for validation
+- Follow PSR-12 coding standards
+- Use type hints and return types everywhere
+- Service methods throw custom exceptions
+- Use TypeScript for the admin frontend
+
+<!-- EXAMPLE STRUCTURE:
+UserController -> UserService -> User, UserResource --># .cursorrules
+PROJECT: Laravel 12+ API with Service Pattern and Inertia.js (Vue 3 Typescript) Admin frontend
+Key Dependencies: 
+- JWT for API auth
+- Inertia.js server-side and client-side
+- Vue 3 Composition API
+- Tailwind CSS for styling
+CODING STYLE:
+- Controllers are thin, only handle HTTP logic
+- Business logic goes in Service classes
+- Use Dependency Injection for services
+- Return JSON responses which is defined in the App\Utilities::Ok method
+- Return Inertia responses for the Admin Inertia which is defined in the App\Utilities::InertiaOk method
+- Use Laravel Resources for API responses
+- Use Validation Request Class for validation
+- Follow PSR-12 coding standards
+- Use type hints and return types everywhere
+- Service methods throw custom exceptions
+- Use TypeScript for the admin frontend
+
+<!-- EXAMPLE STRUCTURE:
+UserController -> UserService -> User, UserResource -->
