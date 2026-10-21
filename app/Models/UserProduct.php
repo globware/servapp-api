@@ -11,6 +11,24 @@ class UserProduct extends Model
 
     public static $type = "App\Models\UserProduct";
 
+    protected $fillable = [
+        'name',
+        'description',
+        'price',
+        'address',
+        'latitude',
+        'longitude',
+        'product_id',
+        'user_id',
+        'ratings',
+        'country_id',
+        'state_id',
+        'location_id',
+        'verified',
+        'suspended',
+        'active',
+    ];
+
     public function toSearchableArray()
     {
         return [
@@ -30,6 +48,16 @@ class UserProduct extends Model
     public function getType()
     {
         return Self::$type;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 
     public function reviews()
@@ -110,8 +138,8 @@ class UserProduct extends Model
         });
 
         static::created(function (UserProduct $product) {
-            $product->ratings = $this->rating;
-            $product->update();
+            $product->ratings = $product->rating();
+            $product->updateQuietly();
         });
     }
 }

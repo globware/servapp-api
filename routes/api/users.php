@@ -26,6 +26,7 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/user', 'namespace' => 'U
     });
     Route::group(['prefix' => '/user_services'], function () {
         Route::get("", [ServiceController::class, "getUserServices"]);
+        Route::get("/get_by_location", [ServiceController::class, "getUserServicesByLocation"]);
         Route::group(['prefix' => '/requests'], function () {
             Route::get("", [ServiceRequestController::class, "getRequests"]);
             Route::post("/make_request", [ServiceRequestController::class, "requestService"]);
@@ -43,6 +44,9 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/user', 'namespace' => 'U
         Route::get("/{userServiceId}", [ServiceController::class, "getUserService"]);
         Route::patch("/read_messages/{serviceId}", [ServiceController::class, "readMessage"]);
         Route::post("/complain", [ServiceController::class, "complain"]);
+    });
+    Route::group(['prefix' => '/services'], function () {
+        Route::get("/get_by_location", [ServiceController::class, "getUserServicesByLocation"]);
     });
     Route::group(['prefix' => '/providers'], function () {
         Route::get("", [ProviderController::class, "providers"]);

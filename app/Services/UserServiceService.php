@@ -213,6 +213,63 @@ class UserServiceService
         return $query->get();
     }
 
+    public function getByLocation(array $params = [], array $with = [])
+    {
+        $lat = $params['lat'] ?? null;
+        $long = $params['long'] ?? null;
+        $radius = (float) ($params['radius'] ?? 25);
+        $locationId = $params['location_id'] ?? null;
+        $serviceId = $params['service_id'] ?? null;
+
+        $query = UserService::with($with)->withCount($this->count);
+
+        if ($this->approved !== null) {
+            $query->where('approved', $this->approved);
+        }
+        if ($this->active !== null) {
+            $query->where('active', $this->active);
+        }
+        $query->where('suspended', false);
+
+        if ($serviceId) {
+            $query->where('service_id', $serviceId);
+        }
+
+        if ($lat && $long) {
+            $haversine = "(6371 * acos(
+                cos(radians(?)) *
+                cos(radians(latitude)) *
+                cos(radians(longitude) - radians(?)) +
+                sin(radians(?)) *
+                sin(radians(latitude))
+            ))";
+
+            $query->selectRaw("user_services.*, {$haversine} AS distance", [$lat, $long, $lat])
+                  ->whereNotNull('latitude')
+                  ->whereNotNull('longitude')
+                  ->whereRaw("{$haversine} <= ?", [$lat, $long, $lat, $radius])
+                  ->orderBy('distance', 'ASC');
+        } elseif ($locationId) {
+            $query->where('location_id', $locationId)
+                  ->orderBy('created_at', 'DESC');
+        } else {
+            $query->orderBy('created_at', 'DESC');
+        }
+
+        $limit = $this->limit ?? (int) env('PAGINATION_PER_PAGE', 10);
+        $perPage = min(100, max(1, $limit));
+
+        if ($this->paginated) {
+            return $query->paginate($perPage, ['*'], 'page', $this->page);
+        }
+
+        if ($this->limit) {
+            $query->limit($this->limit);
+        }
+
+        return $query->get();
+    }
+
     public function getService($id, $with=[])
     {
         return UserService::with($with)->withCount($this->count)->where("id", $id)->first();

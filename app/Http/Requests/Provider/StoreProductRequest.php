@@ -15,6 +15,18 @@ class StoreProductRequest extends FormRequest
     }
 
     /**
+     * Prepare inputs for validation to support both camelCase and snake_case.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('productId') && !$this->has('product_id')) {
+            $this->merge([
+                'product_id' => $this->productId,
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>

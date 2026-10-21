@@ -121,6 +121,48 @@ class ServiceController extends Controller
         return Utilities::paginatedOk(UserServiceResource::collection($services), $meta);
     }
 
+    public function getUserServicesByLocation(Request $request)
+    {
+        $lat = $request->query('lat');
+        $long = $request->query('long');
+        $locationId = $request->query('location_id');
+
+        if (!$lat && !$long && !$locationId && Auth::check() && Auth::user()->location_id) {
+            $locationId = Auth::user()->location_id;
+        }
+
+        $this->userServiceService->paginated = true;
+        $this->userServiceService->page = (int) $request->query('page', 1);
+        $this->userServiceService->limit = (int) $request->query('perPage', env('PAGINATION_PER_PAGE', 10));
+
+        $params = [
+            'lat' => $lat,
+            'long' => $long,
+            'radius' => (float) $request->query('radius', 25),
+            'location_id' => $locationId,
+            'service_id' => $request->query('service_id'),
+        ];
+
+        $relations = ['service', 'country', 'state', 'location', 'media'];
+        $services = $this->userServiceService->getByLocation($params, $relations);
+
+        // Fallback to location_id if GPS search yielded 0 results
+        if ($services->isEmpty() && $locationId && ($lat || $long)) {
+            $params['lat'] = null;
+            $params['long'] = null;
+            $services = $this->userServiceService->getByLocation($params, $relations);
+        }
+
+        $meta = [
+            'page' => $services->currentPage(),
+            'perPage' => $services->perPage(),
+            'total' => $services->total(),
+            'lastPage' => $services->lastPage()
+        ];
+
+        return Utilities::paginatedOk(UserServiceResource::collection($services), $meta);
+    }
+
     public function sendMessage(SendMessage $request)
     {
         try {

@@ -56,6 +56,7 @@ class UserProductService
 
         $data['user_id'] = $userId;
         $data['active'] = true;
+        unset($data['mediaIds']);
         
         return UserProduct::create($data);
     }

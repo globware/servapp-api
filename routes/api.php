@@ -51,6 +51,10 @@ Route::domain(config('app.api_domain'))->group(function () {
         Route::get("", [ServiceCategoryController::class, "categories"]);
     });
 
+    Route::group(['middleware' => 'UserAuth', 'prefix' => '/product_categories'], function () {
+        Route::get("", [ProductCategoryController::class, "index"]);
+    });
+
 
     Route::group(['middleware' => 'UserAuth', 'prefix' => '/tickets'], function () {
         Route::post("", [TicketController::class, "create"]);

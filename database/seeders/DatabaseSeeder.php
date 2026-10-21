@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 
 use Database\Seeders\Services;
+use Database\Seeders\Products;
 use Database\Seeders\MoveLocationLongLat;
 use Database\Seeders\AdminSeeder;
 
@@ -20,6 +21,7 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
         $seeders = [
             new Services,
+            new Products,
             new AdminSeeder
             // new MoveLocationLongLat
         ];
