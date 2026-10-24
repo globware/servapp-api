@@ -12,6 +12,11 @@ class Chat extends Model
         return $this->morphTo();
     }
 
+    public function request()
+    {
+        return $this->belongsTo(UserServiceRequest::class, "user_service_request_id", "id");
+    }
+
     public function sender()
     {
         return $this->morphTo('sender');

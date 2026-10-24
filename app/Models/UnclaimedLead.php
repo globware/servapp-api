@@ -11,6 +11,27 @@ class UnclaimedLead extends Model
 
     protected $guarded = [];
 
+    public function getTitleAttribute($value)
+    {
+        return $value ?: $this->business_name;
+    }
+
+    public function setTitleAttribute($value)
+    {
+        $this->attributes['title'] = $value;
+        if (empty($this->attributes['business_name'])) {
+            $this->attributes['business_name'] = $value;
+        }
+    }
+
+    public function setBusinessNameAttribute($value)
+    {
+        $this->attributes['business_name'] = $value;
+        if (empty($this->attributes['title'])) {
+            $this->attributes['title'] = $value;
+        }
+    }
+
     public function toSearchableArray()
     {
         return [

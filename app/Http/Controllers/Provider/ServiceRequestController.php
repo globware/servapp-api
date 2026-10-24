@@ -39,14 +39,14 @@ class ServiceRequestController extends Controller
     public function getRequest($requestId)
     {
         try{
-            $serviceRequest = $this->requestService->getRequest($requestId, ['user']);
+            $serviceRequest = $this->requestService->getRequest($requestId, ['user', 'userService']);
             if(!$serviceRequest) return Utilities::error402("Service Request does not exist");
 
-            if($serviceRequest->userService->user_id != Auth::user()->id) return Utilities::error402("You are not authorized to view this request");
+            if(!$serviceRequest->userService || $serviceRequest->userService->user_id != Auth::user()->id) return Utilities::error402("You are not authorized to view this request");
 
             return Utilities::ok(new ServiceRequestResource($serviceRequest, UserService::$type));
         } catch(\Exception $e) {
-            throw $e;
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
     }
 
@@ -57,7 +57,7 @@ class ServiceRequestController extends Controller
 
             return Utilities::okay("Request Accepted Successfully");
         } catch(\Exception $e) {
-            throw $e;
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
     }
 
@@ -84,26 +84,26 @@ class ServiceRequestController extends Controller
             return Utilities::okay("Message sent");
             
         } catch(\Exception $e) {
-            throw $e;
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
     }
 
     public function getRequestChats($requestId)
     {
         try{
-            $serviceRequest = $this->requestService->getRequest($requestId, ['user']);
+            $serviceRequest = $this->requestService->getRequest($requestId, ['user', 'userService']);
             if(!$serviceRequest) return Utilities::error402("Service Request does not exist");
 
-            if($serviceRequest->userService->user_id != Auth::user()->id) return Utilities::error402("You are not authorized to view this request");
+            if(!$serviceRequest->userService || $serviceRequest->userService->user_id != Auth::user()->id) return Utilities::error402("You are not authorized to view this request");
 
             // mark all the chat sent to this user Service as seen by the user Service
             $this->chatService->markAsSeen($requestId, $serviceRequest->userService->id, UserService::$type);
             
-            $chats = $this->chatService->getMessages($requestId);
+            $chats = $this->chatService->getMessages($requestId, ['sender', 'receiver', 'media']);
 
             return Utilities::ok(ChatResource::collection($chats));
         } catch(\Exception $e) {
-            throw $e;
+            return Utilities::error($e, "An Error Occurred while attempting to perform this operation");
         }
     }
 

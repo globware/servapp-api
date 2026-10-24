@@ -20,9 +20,9 @@ class UserProductService
         ];
     }
 
-    public function getProviderProducts($userId)
+    public function getProviderProducts($userId, $with = ['media', 'product'])
     {
-        return UserProduct::where('user_id', $userId)->get();
+        return UserProduct::with($with)->where('user_id', $userId)->get();
     }
 
     public function getProduct($id)

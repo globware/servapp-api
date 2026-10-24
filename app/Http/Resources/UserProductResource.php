@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use App\Http\Resources\UserResource;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\UserProductRequestResource;
 use App\Http\Resources\ServiceResource;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\FileResource;
@@ -31,6 +33,7 @@ class UserProductResource extends JsonResource
             "active" => $this->active,
             "is_unclaimed" => false, // Distinguish from unclaimed leads
             "user" => new UserResource($this->whenLoaded("user")),
+            "product" => new ProductResource($this->whenLoaded("product")),
             "media" => FileResource::collection($this->whenLoaded("media")),
             "requests" => UserProductRequestResource::collection($this->whenLoaded("requests")),
             "chats" => ChatResource::collection($this->whenLoaded("chats"))

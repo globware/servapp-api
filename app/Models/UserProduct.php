@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use App\Helpers;
 
 class UserProduct extends Model
 {
@@ -60,6 +61,11 @@ class UserProduct extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function requests()
+    {
+        return $this->hasMany(UserProductRequest::class);
+    }
+
     public function reviews()
     {
         return $this->hasMany(UserProductReview::class);
@@ -68,11 +74,6 @@ class UserProduct extends Model
     public function patronizers()
     {
         return $this->morphMany(Patronizer::class, 'target');
-    }
-
-    public function userRatings()
-    {
-        return $this->morphMany(Rating::class, 'target');
     }
 
     public function productMedia()
@@ -102,11 +103,17 @@ class UserProduct extends Model
 
     public function rating()
     {
-        if($this->userRatings->count() > 0) {
+        if ($this->reviews && $this->reviews->count() > 0) {
             $ratingsArr = [];
-            foreach($this->userRatings as $rating) $ratingsArr[] = $rating->ratings;
-            $average = Helpers::getAverage($ratingsArr);
-            return ($average) ? $average : $this->ratings;
+            foreach ($this->reviews as $review) {
+                if (isset($review->rating)) {
+                    $ratingsArr[] = $review->rating;
+                }
+            }
+            if (!empty($ratingsArr)) {
+                $average = Helpers::getAverage($ratingsArr);
+                return ($average) ? $average : $this->ratings;
+            }
         }
         return $this->ratings;
     }
@@ -116,24 +123,16 @@ class UserProduct extends Model
         parent::boot();
 
         static::deleting(function (UserProduct $product) {
-            if($product->userRatings->count() > 0) {
-                foreach($product->userRatings as $rating) $rating->delete();
+            if ($product->reviews && $product->reviews->count() > 0) {
+                foreach ($product->reviews as $review) $review->delete();
             }
 
-            if($product->reviews->count() > 0) {
-                foreach($product->reviews as $review) $review->delete();
+            if ($product->patronizers && $product->patronizers->count() > 0) {
+                foreach ($product->patronizers as $patronizer) $patronizer->delete();
             }
 
-            if($product->patronizers->count() > 0) {
-                foreach($product->patronizers as $patronizer) $patronizer->delete();
-            }
-
-            if($product->productMedia->count() > 0) {
-                foreach($product->productMedia as $media) $media->delete();
-            }
-
-            if($product->messages->count() > 0) {
-                foreach($product->messages as $message) $message->delete();
+            if ($product->productMedia && $product->productMedia->count() > 0) {
+                foreach ($product->productMedia as $media) $media->delete();
             }
         });
 
