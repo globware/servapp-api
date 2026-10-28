@@ -25,6 +25,7 @@ class UserProduct extends Model
         'country_id',
         'state_id',
         'location_id',
+        'provider_location_id',
         'verified',
         'suspended',
         'active',
@@ -59,6 +60,11 @@ class UserProduct extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function providerLocation()
+    {
+        return $this->belongsTo(ProviderLocation::class, 'provider_location_id');
     }
 
     public function requests()

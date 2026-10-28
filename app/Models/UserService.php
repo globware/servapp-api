@@ -102,6 +102,11 @@ class UserService extends Model
         return $this->belongsTo(Location::class);
     }
 
+    public function providerLocation()
+    {
+        return $this->belongsTo(ProviderLocation::class, 'provider_location_id');
+    }
+
     // public function userFeedbacks()
     // {
     //     return $this->morphMany(UserFeedback::class, 'target');

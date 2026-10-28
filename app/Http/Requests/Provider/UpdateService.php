@@ -18,6 +18,26 @@ class UpdateService extends BaseRequest
     }
 
     /**
+     * Prepare inputs for validation to support both camelCase and snake_case.
+     */
+    protected function prepareForValidation(): void
+    {
+        $merge = [];
+        if ($this->has('provider_location_id') && !$this->has('providerLocationId')) {
+            $merge['providerLocationId'] = $this->provider_location_id;
+        }
+        if ($this->has('save_location') && !$this->has('saveLocation')) {
+            $merge['saveLocation'] = $this->save_location;
+        }
+        if ($this->has('location_title') && !$this->has('locationTitle')) {
+            $merge['locationTitle'] = $this->location_title;
+        }
+        if (!empty($merge)) {
+            $this->merge($merge);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -27,13 +47,16 @@ class UpdateService extends BaseRequest
         return [
             "name" => ["nullable", "string", new UniqueService()],
             "serviceId" => "nullable|integer|exists:services,id",
+            "providerLocationId" => "nullable|integer|exists:provider_locations,id",
+            "saveLocation" => "nullable|boolean",
+            "locationTitle" => "nullable|string|max:255",
             "address" => "nullable|string",
             "locationId" => "nullable|integer|exists:locations,id",
             "coverPhotoId" => "nullable|integer|exists:files,id",
             "email" => "nullable|email",
             "phoneNumbers" => "nullable|string",
-            "long" => "nullable|string",
-            "lat" => "nullable|string",
+            "long" => "nullable",
+            "lat" => "nullable",
             "minPrice" => "nullable|numeric",
             "maxPrice" => "nullable|numeric",
             "allDay" => "nullable|boolean",

@@ -17,6 +17,7 @@ use App\Http\Resources\LocationResource;
 use App\Http\Resources\PatronizerResource;
 use App\Http\Resources\ServiceRequestResource;
 use App\Http\Resources\ChatResource;
+use App\Http\Resources\ProviderLocationResource;
 
 class UserServiceResource extends JsonResource
 {
@@ -42,8 +43,10 @@ class UserServiceResource extends JsonResource
             "rating" => $this->rating(),
             "verified" => $this->verified,
             "suspended" => $this->suspended,
-            "longitude" => $this->longitude,
-            "latitude" => $this->latitude,
+            "address" => $this->address ?? $this->providerLocation?->address,
+            "longitude" => $this->longitude ?? $this->providerLocation?->longitude,
+            "latitude" => $this->latitude ?? $this->providerLocation?->latitude,
+            "providerLocationId" => $this->provider_location_id,
             "minPrice" => $this->min_price,
             "maxPrice" => $this->max_price,
             "allDay" => $this->all_day,
@@ -59,6 +62,7 @@ class UserServiceResource extends JsonResource
             "country" => new CountryResource($this->whenLoaded("country")),
             "state" => new StateResource($this->whenLoaded("state")),
             "location" => new LocationResource($this->whenLoaded("location")),
+            "providerLocation" => new ProviderLocationResource($this->whenLoaded("providerLocation")),
             "media" => FileResource::collection($this->whenLoaded("media")),
             "tags" => ServiceTagResource::collection($this->whenLoaded("tags")),
             "documents" => FileResource::collection($this->whenLoaded("documents")),
@@ -69,7 +73,7 @@ class UserServiceResource extends JsonResource
             "chats" => ChatResource::collection($this->whenLoaded("chats"))
         ];
         // dd($this->userRequests);
-        if($this->userRequests instanceof Collection) {
+        if ($this->userRequests instanceof Collection) {
             // dd($this->userRequests);
             $resource['userRequests'] = ServiceRequestResource::collection($this->userRequests);
         }

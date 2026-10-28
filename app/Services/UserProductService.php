@@ -6,9 +6,14 @@ use App\Models\UserProduct;
 use App\Models\UnclaimedLead;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\AppException;
+use App\Services\ProviderLocationService;
 
 class UserProductService
 {
+    public function __construct(protected ProviderLocationService $providerLocationService)
+    {
+    }
+
     public function searchProductsAndLeads($query)
     {
         $products = UserProduct::search($query)->where('active', true)->get();
@@ -20,14 +25,14 @@ class UserProductService
         ];
     }
 
-    public function getProviderProducts($userId, $with = ['media', 'product'])
+    public function getProviderProducts($userId, $with = ['media', 'product', 'providerLocation'])
     {
         return UserProduct::with($with)->where('user_id', $userId)->get();
     }
 
-    public function getProduct($id)
+    public function getProduct($id, $with = ['media', 'product', 'providerLocation'])
     {
-        return UserProduct::find($id);
+        return UserProduct::with($with)->find($id);
     }
 
     public function save(array $data, $userId)
@@ -54,11 +59,37 @@ class UserProductService
             ]));
         }
 
+        // Handle provider location
+        if (!empty($data['provider_location_id'])) {
+            $providerLocation = $this->providerLocationService->getLocation($data['provider_location_id'], $userId);
+            if (!$providerLocation) {
+                throw new AppException("Selected provider location not found or unauthorized.");
+            }
+            $data['address'] = $data['address'] ?? $providerLocation->address;
+            $data['latitude'] = $data['latitude'] ?? $providerLocation->latitude;
+            $data['longitude'] = $data['longitude'] ?? $providerLocation->longitude;
+            $data['country_id'] = $providerLocation->country_id;
+            $data['state_id'] = $providerLocation->state_id;
+            $data['location_id'] = $providerLocation->location_id;
+        } elseif (!empty($data['save_location']) && !empty($data['address'])) {
+            $savedLocation = $this->providerLocationService->save([
+                'title' => $data['location_title'] ?? null,
+                'address' => $data['address'],
+                'latitude' => $data['latitude'] ?? null,
+                'longitude' => $data['longitude'] ?? null,
+                'country_id' => $data['country_id'] ?? null,
+                'state_id' => $data['state_id'] ?? null,
+                'location_id' => $data['location_id'] ?? null,
+            ], $userId);
+            $data['provider_location_id'] = $savedLocation->id;
+        }
+
         $data['user_id'] = $userId;
         $data['active'] = true;
-        unset($data['mediaIds']);
+        unset($data['mediaIds'], $data['save_location'], $data['location_title']);
         
-        return UserProduct::create($data);
+        $product = UserProduct::create($data);
+        return $product->fresh(['media', 'product', 'providerLocation']);
     }
 
     public function update($id, array $data, $userId)
@@ -66,8 +97,35 @@ class UserProductService
         $product = UserProduct::where('user_id', $userId)->find($id);
         if (!$product) throw new AppException("Product not found or unauthorized");
 
+        // Handle provider location
+        if (isset($data['provider_location_id'])) {
+            $providerLocation = $this->providerLocationService->getLocation($data['provider_location_id'], $userId);
+            if (!$providerLocation) {
+                throw new AppException("Selected provider location not found or unauthorized.");
+            }
+            $data['address'] = $providerLocation->address;
+            $data['latitude'] = $providerLocation->latitude;
+            $data['longitude'] = $providerLocation->longitude;
+            $data['country_id'] = $providerLocation->country_id;
+            $data['state_id'] = $providerLocation->state_id;
+            $data['location_id'] = $providerLocation->location_id;
+        } elseif (!empty($data['save_location']) && (!empty($data['address']) || !empty($product->address))) {
+            $savedLocation = $this->providerLocationService->save([
+                'title' => $data['location_title'] ?? null,
+                'address' => $data['address'] ?? $product->address,
+                'latitude' => $data['latitude'] ?? $product->latitude,
+                'longitude' => $data['longitude'] ?? $product->longitude,
+                'country_id' => $data['country_id'] ?? $product->country_id,
+                'state_id' => $data['state_id'] ?? $product->state_id,
+                'location_id' => $data['location_id'] ?? $product->location_id,
+            ], $userId);
+            $data['provider_location_id'] = $savedLocation->id;
+        }
+
+        unset($data['mediaIds'], $data['save_location'], $data['location_title']);
+
         $product->update($data);
-        return $product;
+        return $product->fresh(['media', 'product', 'providerLocation']);
     }
 
     public function delete($id, $userId)

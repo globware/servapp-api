@@ -15,6 +15,28 @@ class UpdateProductRequest extends FormRequest
     }
 
     /**
+     * Prepare inputs for validation to support both camelCase and snake_case.
+     */
+    protected function prepareForValidation(): void
+    {
+        $merge = [];
+
+        if ($this->has('providerLocationId') && !$this->has('provider_location_id')) {
+            $merge['provider_location_id'] = $this->providerLocationId;
+        }
+        if ($this->has('saveLocation') && !$this->has('save_location')) {
+            $merge['save_location'] = $this->saveLocation;
+        }
+        if ($this->has('locationTitle') && !$this->has('location_title')) {
+            $merge['location_title'] = $this->locationTitle;
+        }
+
+        if (!empty($merge)) {
+            $this->merge($merge);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -28,6 +50,9 @@ class UpdateProductRequest extends FormRequest
             'address' => 'nullable|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'provider_location_id' => 'nullable|integer|exists:provider_locations,id',
+            'save_location' => 'nullable|boolean',
+            'location_title' => 'nullable|string|max:255',
             'active' => 'boolean',
             'mediaIds' => 'nullable|array',
             'mediaIds.*' => 'integer'

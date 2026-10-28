@@ -14,6 +14,7 @@ use App\Http\Controllers\Provider\VerificationController;
 use App\Http\Controllers\Provider\ProductController;
 use App\Http\Controllers\Provider\ProductRequestController;
 use App\Http\Controllers\Provider\ClaimController;
+use App\Http\Controllers\Provider\LocationController;
 
 Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' => 'Provider',], function () {
     Route::group(['prefix' => '/messages'], function () {
@@ -91,4 +92,13 @@ Route::group(['middleware' => 'UserAuth', 'prefix' => '/provider', 'namespace' =
     // MVP Claiming Engine
     Route::post('/claim/{leadId}', [ClaimController::class, 'claim'])->middleware('NumericParam:leadId');
     Route::get('/leads/search', [ClaimController::class, 'search']);
+
+    // Provider Saved Locations
+    Route::group(['prefix' => '/locations'], function () {
+        Route::get("", [LocationController::class, "index"]);
+        Route::post("", [LocationController::class, "store"]);
+        Route::get("/{id}", [LocationController::class, "show"])->middleware('NumericParam:id');
+        Route::patch("/{id}", [LocationController::class, "update"])->middleware('NumericParam:id');
+        Route::delete("/{id}", [LocationController::class, "destroy"])->middleware('NumericParam:id');
+    });
 });

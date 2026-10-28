@@ -22,7 +22,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Artisan::call('db:seed', array('--class' => 'States'));
+        if (!app()->environment('testing') && !App\Models\Location::exists()) {
+            Artisan::call('db:seed', array('--class' => 'States'));
+        }
     }
 
     /**

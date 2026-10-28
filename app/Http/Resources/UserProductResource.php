@@ -17,6 +17,7 @@ use App\Http\Resources\ServicePatronizerResource;
 use App\Http\Resources\ServiceRequestResource;
 use App\Http\Resources\ServiceReviewResource;
 use App\Http\Resources\ChatResource;
+use App\Http\Resources\ProviderLocationResource;
 
 class UserProductResource extends JsonResource
 {
@@ -27,13 +28,15 @@ class UserProductResource extends JsonResource
             "name" => $this->name,
             "description" => $this->description,
             "price" => $this->price,
-            "address" => $this->address,
-            "latitude" => $this->latitude,
-            "longitude" => $this->longitude,
+            "address" => $this->address ?? $this->providerLocation?->address,
+            "latitude" => $this->latitude ?? $this->providerLocation?->latitude,
+            "longitude" => $this->longitude ?? $this->providerLocation?->longitude,
+            "providerLocationId" => $this->provider_location_id,
             "active" => $this->active,
             "is_unclaimed" => false, // Distinguish from unclaimed leads
             "user" => new UserResource($this->whenLoaded("user")),
             "product" => new ProductResource($this->whenLoaded("product")),
+            "providerLocation" => new ProviderLocationResource($this->whenLoaded("providerLocation")),
             "media" => FileResource::collection($this->whenLoaded("media")),
             "requests" => UserProductRequestResource::collection($this->whenLoaded("requests")),
             "chats" => ChatResource::collection($this->whenLoaded("chats"))

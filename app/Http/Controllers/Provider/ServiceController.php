@@ -50,7 +50,7 @@ class ServiceController extends Controller
     public function service($serviceId)
     {
         $this->service->count = ['requests'];
-        $service = $this->service->getService($serviceId, ['media', 'tags', 'requests']);
+        $service = $this->service->getService($serviceId, ['media', 'tags', 'requests', 'providerLocation']);
 
         if(!$service) return Utilities::error402("Service not found");
 
@@ -65,7 +65,7 @@ class ServiceController extends Controller
         $this->service->count = ['requests'];
         $this->service->approved = null;
         $this->service->active = null;
-        $services = $this->service->getServices(['media', 'tags', 'feedbacks', 'service']);
+        $services = $this->service->getServices(['media', 'tags', 'feedbacks', 'service', 'providerLocation']);
         
         return Utilities::ok(UserServiceResource::collection($services));
     }
@@ -80,7 +80,7 @@ class ServiceController extends Controller
             $data['userId'] = Auth::user()->id;
 
             $userService = $this->service->save($data);
-            $userService->load(["media", "tags"]);
+            $userService->load(["media", "tags", "providerLocation"]);
 
             return Utilities::ok(new UserServiceResource($userService));
         } catch(\Exception $e) {
@@ -123,7 +123,7 @@ class ServiceController extends Controller
 
             DB::commit();
 
-            $service = $this->service->getService($service->id, ['media', 'tags']);
+            $service = $this->service->getService($service->id, ['media', 'tags', 'providerLocation']);
 
             return Utilities::ok(new UserServiceResource($service));
 

@@ -118,6 +118,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(UserService::class);
     }
 
+    public function providerLocations()
+    {
+        return $this->hasMany(ProviderLocation::class);
+    }
+
     public function tickets()
     {
         return $this->hasMany(Ticket::class);

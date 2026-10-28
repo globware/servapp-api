@@ -12,12 +12,14 @@ use App\Models\UserServiceMedia;
 use App\Services\UserService as UserServiceClass;
 use App\Services\ServiceService;
 use App\Services\LocationService;
+use App\Services\ProviderLocationService;
 
 class UserServiceService 
 {
     protected $userService;
     protected $service;
     protected $locationService;
+    protected $providerLocationService;
 
     public $userId = null;
     public $serviceId = null;
@@ -34,6 +36,7 @@ class UserServiceService
         $this->userService = new UserServiceClass;
         $this->service = new ServiceService;
         $this->locationService = new LocationService;
+        $this->providerLocationService = new ProviderLocationService;
     }
 
     public function save($data)
@@ -46,17 +49,44 @@ class UserServiceService
                 $service = $this->service->getService($data['serviceId']);
                 $data['name'] = $user->firstname . ' ' . $service->name;
             }
-            $location = $this->locationService->getLocation($data['locationId']);
+            if (!empty($data['providerLocationId'])) {
+                $providerLoc = $this->providerLocationService->getLocation($data['providerLocationId'], $data['userId']);
+                if (!$providerLoc) {
+                    throw new AppException(402, "Selected provider location not found or unauthorized.");
+                }
+                $userService->provider_location_id = $providerLoc->id;
+                $userService->address = $data['address'] ?? $providerLoc->address;
+                $userService->location_id = $data['locationId'] ?? $providerLoc->location_id;
+                $userService->state_id = $providerLoc->state_id;
+                $userService->country_id = $providerLoc->country_id;
+                $userService->latitude = $data['lat'] ?? $providerLoc->latitude;
+                $userService->longitude = $data['long'] ?? $providerLoc->longitude;
+            } else {
+                $location = $this->locationService->getLocation($data['locationId']);
+                $userService->address = $data['address'];
+                $userService->location_id = $data['locationId'];
+                $userService->state_id = $location?->state?->id;
+                $userService->country_id = $location?->state?->country?->id;
+                if(isset($data['long'])) $userService->longitude = $data['long'];
+                if(isset($data['lat'])) $userService->latitude = $data['lat'];
+
+                if (!empty($data['saveLocation'])) {
+                    $savedLoc = $this->providerLocationService->save([
+                        'title' => $data['locationTitle'] ?? null,
+                        'address' => $data['address'],
+                        'latitude' => $userService->latitude,
+                        'longitude' => $userService->longitude,
+                        'country_id' => $userService->country_id,
+                        'state_id' => $userService->state_id,
+                        'location_id' => $userService->location_id,
+                    ], $data['userId']);
+                    $userService->provider_location_id = $savedLoc->id;
+                }
+            }
 
             $userService->user_id = $data['userId'];
             $userService->service_id = $data['serviceId'];
             $userService->name = $data['name'];
-            $userService->address = $data['address'];
-            $userService->location_id = $data['locationId'];
-            $userService->state_id = $location->state->id;
-            $userService->country_id = $location->state->country->id;
-            if(isset($data['long'])) $userService->longitude = $data['long'];
-            if(isset($data['lat'])) $userService->latitude = $data['lat'];
             if(isset($data['phoneNumbers'])) $userService->phone_numbers = array_filter(
                 array_map('trim', explode(',', $data['phoneNumbers'])),
                 fn($v) => $v !== ""
@@ -102,25 +132,54 @@ class UserServiceService
             $userService->cover_photo_id = $data['coverPhotoId'];
         }
 
-        if(isset($data['address'])) {
-            if($userService->address != $data['address']) $updated[] = 'Address';
-            $userService->address = $data['address'];
-        }
-
-        if(isset($data['locationId'])) {
-            if($userService->location_id != $data['locationId']) {
-                $location = $this->locationService->getLocation($data['locationId']);
-                $updated[] = 'Location';
-                $userService->location_id = $data['locationId'];
-                $userService->state_id = $location->state->id;
-                $userService->country_id = $location->state->country->id;
+        if (isset($data['providerLocationId'])) {
+            $providerLoc = $this->providerLocationService->getLocation($data['providerLocationId'], $userService->user_id);
+            if (!$providerLoc) {
+                throw new AppException(402, "Selected provider location not found or unauthorized.");
             }
-        }
+            $userService->provider_location_id = $providerLoc->id;
+            $userService->address = $providerLoc->address;
+            $userService->location_id = $providerLoc->location_id;
+            $userService->state_id = $providerLoc->state_id;
+            $userService->country_id = $providerLoc->country_id;
+            $userService->latitude = $providerLoc->latitude;
+            $userService->longitude = $providerLoc->longitude;
+            $updated[] = 'Location';
+        } else {
+            if(isset($data['address'])) {
+                if($userService->address != $data['address']) $updated[] = 'Address';
+                $userService->address = $data['address'];
+            }
 
-        if(isset($data['long']) || isset($data['lat'])) {
-            if($userService->longitude != $data['long'] || $userService->latitude != $data['lat']) $updated[] = 'GPS';
-            if(isset($data['long'])) $userService->longitude = $data['long'];
-            if(isset($data['lat'])) $userService->latitude = $data['lat'];
+            if(isset($data['locationId'])) {
+                if($userService->location_id != $data['locationId']) {
+                    $location = $this->locationService->getLocation($data['locationId']);
+                    $updated[] = 'Location';
+                    $userService->location_id = $data['locationId'];
+                    $userService->state_id = $location?->state?->id;
+                    $userService->country_id = $location?->state?->country?->id;
+                }
+            }
+
+            if(isset($data['long']) || isset($data['lat'])) {
+                if($userService->longitude != ($data['long'] ?? $userService->longitude) || $userService->latitude != ($data['lat'] ?? $userService->latitude)) $updated[] = 'GPS';
+                if(isset($data['long'])) $userService->longitude = $data['long'];
+                if(isset($data['lat'])) $userService->latitude = $data['lat'];
+            }
+
+            if (!empty($data['saveLocation']) && !empty($userService->address)) {
+                $savedLoc = $this->providerLocationService->save([
+                    'title' => $data['locationTitle'] ?? null,
+                    'address' => $userService->address,
+                    'latitude' => $userService->latitude,
+                    'longitude' => $userService->longitude,
+                    'country_id' => $userService->country_id,
+                    'state_id' => $userService->state_id,
+                    'location_id' => $userService->location_id,
+                ], $userService->user_id);
+                $userService->provider_location_id = $savedLoc->id;
+                $updated[] = 'SavedLocation';
+            }
         }
         
         if(isset($data['phoneNumbers'])) $userService->phone_numbers = explode(",", $data['phoneNumbers']);

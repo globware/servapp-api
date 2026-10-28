@@ -45,10 +45,11 @@ class ProductController extends Controller
         try {
             $product = $this->productService->save($validated, Auth::id());
             if ($request->has('mediaIds')) {
-            $product->media()->sync($validated['mediaIds']);
-        }
+                $product->media()->sync($validated['mediaIds']);
+            }
+            $product->load(['media', 'product', 'providerLocation']);
         
-        return Utilities::ok(new UserProductResource($product));
+            return Utilities::ok(new UserProductResource($product));
         } catch (\Exception $e) {
             $decoded = json_decode($e->getMessage(), true);
             if (isset($decoded['is_scout_intercept'])) {
@@ -70,10 +71,11 @@ class ProductController extends Controller
         try {
             $product = $this->productService->update($id, $validated, Auth::id());
             if ($request->has('mediaIds')) {
-            $product->media()->sync($validated['mediaIds']);
-        }
+                $product->media()->sync($validated['mediaIds']);
+            }
+            $product->load(['media', 'product', 'providerLocation']);
         
-        return Utilities::ok(new UserProductResource($product));
+            return Utilities::ok(new UserProductResource($product));
         } catch (\Exception $e) {
             return Utilities::error($e, $e->getMessage());
         }
