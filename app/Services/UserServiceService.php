@@ -276,43 +276,53 @@ class UserServiceService
     {
         $lat = $params['lat'] ?? null;
         $long = $params['long'] ?? null;
-        $radius = (float) ($params['radius'] ?? 25);
+        $radius = (float) ($params['radiusKm'] ?? $params['radius'] ?? 25);
         $locationId = $params['location_id'] ?? null;
         $serviceId = $params['service_id'] ?? null;
 
         $query = UserService::with($with)->withCount($this->count);
 
         if ($this->approved !== null) {
-            $query->where('approved', $this->approved);
+            $query->where('user_services.approved', $this->approved);
         }
         if ($this->active !== null) {
-            $query->where('active', $this->active);
+            $query->where('user_services.active', $this->active);
         }
-        $query->where('suspended', false);
+        $query->where('user_services.suspended', false);
 
         if ($serviceId) {
-            $query->where('service_id', $serviceId);
+            $query->where('user_services.service_id', $serviceId);
         }
 
         if ($lat && $long) {
-            $haversine = "(6371 * acos(
-                cos(radians(?)) *
-                cos(radians(latitude)) *
-                cos(radians(longitude) - radians(?)) +
-                sin(radians(?)) *
-                sin(radians(latitude))
-            ))";
+            $latCol = "COALESCE(user_services.latitude, provider_locations.latitude)";
+            $longCol = "COALESCE(user_services.longitude, provider_locations.longitude)";
 
-            $query->selectRaw("user_services.*, {$haversine} AS distance", [$lat, $long, $lat])
-                  ->whereNotNull('latitude')
-                  ->whereNotNull('longitude')
+            $haversine = "(6371 * acos(LEAST(1.0, GREATEST(-1.0,
+                cos(radians(?)) *
+                cos(radians({$latCol})) *
+                cos(radians({$longCol}) - radians(?)) +
+                sin(radians(?)) *
+                sin(radians({$latCol}))
+            ))))";
+
+            $query->leftJoin('provider_locations', 'user_services.provider_location_id', '=', 'provider_locations.id')
+                  ->selectRaw("user_services.*, {$haversine} AS distance", [$lat, $long, $lat])
+                  ->where(function($q) {
+                      $q->whereNotNull('user_services.latitude')
+                        ->orWhereNotNull('provider_locations.latitude');
+                  })
+                  ->where(function($q) {
+                      $q->whereNotNull('user_services.longitude')
+                        ->orWhereNotNull('provider_locations.longitude');
+                  })
                   ->whereRaw("{$haversine} <= ?", [$lat, $long, $lat, $radius])
                   ->orderBy('distance', 'ASC');
         } elseif ($locationId) {
-            $query->where('location_id', $locationId)
-                  ->orderBy('created_at', 'DESC');
+            $query->where('user_services.location_id', $locationId)
+                  ->orderBy('user_services.created_at', 'DESC');
         } else {
-            $query->orderBy('created_at', 'DESC');
+            $query->orderBy('user_services.created_at', 'DESC');
         }
 
         $limit = $this->limit ?? (int) env('PAGINATION_PER_PAGE', 10);

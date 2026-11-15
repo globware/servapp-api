@@ -46,6 +46,8 @@ class UserServiceResource extends JsonResource
             "address" => $this->address ?? $this->providerLocation?->address,
             "longitude" => $this->longitude ?? $this->providerLocation?->longitude,
             "latitude" => $this->latitude ?? $this->providerLocation?->latitude,
+            "distance" => isset($this->distance) ? round((float) $this->distance, 2) : null,
+            "distanceKm" => isset($this->distance) ? round((float) $this->distance, 2) : null,
             "providerLocationId" => $this->provider_location_id,
             "minPrice" => $this->min_price,
             "maxPrice" => $this->max_price,

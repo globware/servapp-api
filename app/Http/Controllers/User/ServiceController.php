@@ -135,10 +135,13 @@ class ServiceController extends Controller
         $this->userServiceService->page = (int) $request->query('page', 1);
         $this->userServiceService->limit = (int) $request->query('perPage', env('PAGINATION_PER_PAGE', 10));
 
+        $radius = (float) $request->query('radiusKm', $request->query('radius', 25));
+
         $params = [
             'lat' => $lat,
             'long' => $long,
-            'radius' => (float) $request->query('radius', 25),
+            'radius' => $radius,
+            'radiusKm' => $radius,
             'location_id' => $locationId,
             'service_id' => $request->query('service_id'),
         ];

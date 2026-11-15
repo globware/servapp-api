@@ -13,7 +13,7 @@ class UserProductRequestService
     public function getUserRequests($userId)
     {
         return UserProductRequest::where('user_id', $userId)
-            ->with('userProduct', 'user')
+            ->with(['userProduct.media', 'userProduct.product', 'userProduct.user', 'user', 'chats'])
             ->get();
     }
 
@@ -21,13 +21,13 @@ class UserProductRequestService
     {
         return UserProductRequest::whereHas('userProduct', function($query) use ($userId) {
             $query->where('user_id', $userId);
-        })->with('userProduct', 'user')->get();
+        })->with(['userProduct.media', 'userProduct.product', 'userProduct.user', 'user', 'chats'])->get();
     }
 
     public function getUserRequest($id, $userId)
     {
         return UserProductRequest::where('user_id', $userId)
-            ->with('userProduct', 'user')
+            ->with(['userProduct.media', 'userProduct.product', 'userProduct.user', 'user', 'chats'])
             ->find($id);
     }
 
@@ -35,23 +35,33 @@ class UserProductRequestService
     {
         return UserProductRequest::whereHas('userProduct', function($query) use ($userId) {
             $query->where('user_id', $userId);
-        })->with('userProduct', 'user')->find($id);
+        })->with(['userProduct.media', 'userProduct.product', 'userProduct.user', 'user', 'chats'])->find($id);
     }
 
     public function createRequest(array $data, $userId)
     {
-        $product = UserProduct::find($data['user_product_id']);
+        $productId = $data['user_product_id'] ?? $data['productId'] ?? $data['userProductId'] ?? $data['product_id'] ?? null;
+        $product = UserProduct::find($productId);
         if (!$product) throw new AppException("Product not found");
+
+        if ($product->user_id == $userId) {
+            throw new AppException("You cannot request your own product");
+        }
+
+        $message = is_array($data['message'] ?? null) ? ($data['message']['message'] ?? '') : ($data['message'] ?? '');
 
         $request = new UserProductRequest();
         $request->user_id = $userId;
-        $request->user_product_id = $data['user_product_id'];
+        $request->user_product_id = $product->id;
+        $request->message = $message ?? '';
         $request->Status = 'inquiry_sent';
         $request->save();
 
-        $this->sendMessage($request, $data['message'], $userId, clone $product->user_id);
+        if (!empty($message) || !empty($data['mediaIds'])) {
+            $this->sendMessage($request, $data, $userId, $product->user_id);
+        }
 
-        return $request->load('userProduct', 'user');
+        return $request->load(['userProduct.media', 'userProduct.product', 'userProduct.user', 'user', 'chats']);
     }
 
     public function changeStatus($id, $userId, $status)
@@ -70,6 +80,12 @@ class UserProductRequestService
         if (\App\Models\UserBlock::where('user_id', $senderId)->where('blocked_user_id', $receiverId)->orWhere('user_id', $receiverId)->where('blocked_user_id', $senderId)->exists()) {
             throw new \App\Exceptions\AppException("Action blocked by user settings.");
         }
+
+        $messageText = is_array($data) ? ($data['message'] ?? null) : $data;
+        $latitude = is_array($data) ? ($data['latitude'] ?? null) : null;
+        $longitude = is_array($data) ? ($data['longitude'] ?? null) : null;
+        $mediaIds = is_array($data) ? ($data['mediaIds'] ?? []) : [];
+
         $chat = new \App\Models\Chat();
         $chat->requestable_id = $inquiry->id;
         $chat->requestable_type = \App\Models\UserProductRequest::class;
@@ -77,13 +93,13 @@ class UserProductRequestService
         $chat->sender_type = \App\Models\User::class;
         $chat->receiver_id = $receiverId;
         $chat->receiver_type = \App\Models\User::class;
-        $chat->message = $data['message'] ?? null;
-        $chat->latitude = $data['latitude'] ?? null;
-        $chat->longitude = $data['longitude'] ?? null;
+        $chat->message = $messageText;
+        $chat->latitude = $latitude;
+        $chat->longitude = $longitude;
         $chat->save();
 
-        if (!empty($data['mediaIds'])) {
-            $chat->media()->sync($data['mediaIds']);
+        if (!empty($mediaIds)) {
+            $chat->media()->sync($mediaIds);
         }
 
         return $chat;

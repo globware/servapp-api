@@ -14,10 +14,20 @@ class UserProductService
     {
     }
 
-    public function searchProductsAndLeads($query)
+    public function searchProductsAndLeads($query, $categoryId = null)
     {
-        $products = UserProduct::search($query)->where('active', true)->get();
-        $leads = UnclaimedLead::search($query)->where('lead_type', 'product')->where('status', 'unclaimed')->where('approved', true)->get();
+        $productsQuery = UserProduct::search($query)->where('active', true);
+        if ($categoryId) {
+            $productsQuery->where('product_id', $categoryId);
+        }
+        $products = $productsQuery->get();
+        $products->load(['media', 'product', 'user', 'providerLocation']);
+        
+        $leadsQuery = UnclaimedLead::search($query)->where('lead_type', 'product')->where('status', 'unclaimed')->where('approved', true);
+        if ($categoryId) {
+            $leadsQuery->where('category_id', $categoryId);
+        }
+        $leads = $leadsQuery->get();
         
         return [
             'products' => $products,
@@ -25,12 +35,12 @@ class UserProductService
         ];
     }
 
-    public function getProviderProducts($userId, $with = ['media', 'product', 'providerLocation'])
+    public function getProviderProducts($userId, $with = ['media', 'product', 'providerLocation', 'user'])
     {
         return UserProduct::with($with)->where('user_id', $userId)->get();
     }
 
-    public function getProduct($id, $with = ['media', 'product', 'providerLocation'])
+    public function getProduct($id, $with = ['media', 'product', 'providerLocation', 'user'])
     {
         return UserProduct::with($with)->find($id);
     }

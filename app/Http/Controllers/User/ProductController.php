@@ -39,7 +39,7 @@ class ProductController extends Controller
         }
         
         // For MVP we just use the custom service that merges leads as well
-        $results = $this->productService->searchProductsAndLeads($query);
+        $results = $this->productService->searchProductsAndLeads($query, $categoryId);
 
         $merged = collect();
         foreach ($results['products'] as $product) {

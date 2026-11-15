@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\UserProductRequestService;
 use App\Http\Resources\UserProductRequestResource;
 use App\Http\Requests\User\SendProductMessageRequest;
+use App\Http\Requests\User\CreateProductRequest;
 use App\Http\Resources\ChatResource;
 use App\Utilities;
 
@@ -44,11 +45,13 @@ class ProductRequestController extends Controller
     /**
      * @return array{status: boolean, message: string, data: \App\Http\Resources\UserProductRequestResource}
      */
-    public function store(SendProductMessageRequest $request)
+    public function store(CreateProductRequest $request)
     {
         try {
             $inquiry = $this->requestService->createRequest($request->validated(), Auth::id());
             return Utilities::ok(new UserProductRequestResource($inquiry));
+        } catch (\App\Exceptions\AppException $e) {
+            throw $e;
         } catch (\Exception $e) {
             return Utilities::error($e, $e->getMessage());
         }
@@ -64,7 +67,7 @@ class ProductRequestController extends Controller
         $inquiry = $this->requestService->getUserRequest($requestId, Auth::id());
         if (!$inquiry) return Utilities::error402("Request not found");
 
-        $chat = $this->requestService->sendMessage($inquiry, $request->message, Auth::id(), $inquiry->userProduct->user_id);
+        $chat = $this->requestService->sendMessage($inquiry, $request->validated(), Auth::id(), $inquiry->userProduct->user_id);
         return Utilities::ok(new ChatResource($chat));
     }
 

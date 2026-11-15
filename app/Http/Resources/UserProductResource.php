@@ -35,6 +35,7 @@ class UserProductResource extends JsonResource
             "active" => $this->active,
             "is_unclaimed" => false, // Distinguish from unclaimed leads
             "user" => new UserResource($this->whenLoaded("user")),
+            "provider" => new UserResource($this->whenLoaded("user")),
             "product" => new ProductResource($this->whenLoaded("product")),
             "providerLocation" => new ProviderLocationResource($this->whenLoaded("providerLocation")),
             "media" => FileResource::collection($this->whenLoaded("media")),

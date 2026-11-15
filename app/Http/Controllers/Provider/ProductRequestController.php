@@ -94,7 +94,7 @@ class ProductRequestController extends Controller
         $inquiry = $this->requestService->getProviderRequest($requestId, Auth::id());
         if (!$inquiry) return Utilities::error402("Request not found");
 
-        $chat = $this->requestService->sendMessage($inquiry, $request->message, Auth::id(), $inquiry->user_id);
+        $chat = $this->requestService->sendMessage($inquiry, $request->validated(), Auth::id(), $inquiry->user_id);
         return Utilities::ok(new ChatResource($chat));
     }
 
