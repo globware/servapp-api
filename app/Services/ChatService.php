@@ -9,6 +9,7 @@ use Kreait\Firebase\Messaging\CloudMessage;
 use App\Models\Chat;
 use App\Models\User;
 use App\Models\UserService;
+use App\Models\UserServiceRequest;
 use App\Services\FcmService;
 
 use App\Services\ServiceRequestService;
@@ -24,7 +25,13 @@ class ChatService
 
     public function getMessages($requestId, $with=[])
     {
-        $query = Chat::with($with)->withCount($this->count)->where("user_service_request_id", $requestId);
+        $query = Chat::with($with)->withCount($this->count)->where(function($q) use ($requestId) {
+            $q->where("user_service_request_id", $requestId)
+              ->orWhere(function($sub) use ($requestId) {
+                  $sub->where("requestable_id", $requestId)
+                      ->where("requestable_type", UserServiceRequest::$type);
+              });
+        });
         if($this->seen != null) $query->where("seen", $this->seen);
         if($this->receiverId && $this->receiverType) $query->where("receiver_type", $this->receiverType)->where("receiver_id", $this->receiverId);
         if($this->senderId && $this->senderType) $query->where("sender_type", $this->senderType)->where("sender_id", $this->senderId);
@@ -38,6 +45,8 @@ class ChatService
             $chat = new Chat;
 
             $chat->user_service_request_id = $data['requestId'];
+            $chat->requestable_id = $data['requestId'];
+            $chat->requestable_type = UserServiceRequest::$type;
 
             $chat->sender_id = $data['entityId'];
             $chat->sender_type = $data['entityType'];

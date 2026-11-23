@@ -199,7 +199,13 @@ class ServiceRequestService
 
     public function getRequestChats($requestId)
     {
-        return Chat::where("user_service_request_id", $requestId)->orderBy("created_at", "DESC")->get();
+        return Chat::where(function($q) use ($requestId) {
+            $q->where("user_service_request_id", $requestId)
+              ->orWhere(function($sub) use ($requestId) {
+                  $sub->where("requestable_id", $requestId)
+                      ->where("requestable_type", UserServiceRequest::$type);
+              });
+        })->orderBy("created_at", "DESC")->get();
     }
 
     public function sendMessage($data, $requestId)
@@ -209,6 +215,8 @@ class ServiceRequestService
 
         $chat = new Chat;
         $chat->user_service_request_id = $requestId;
+        $chat->requestable_id = $requestId;
+        $chat->requestable_type = UserServiceRequest::$type;
         $chat->sender_id = $data['senderId'];
         $chat->sender_type = $data['senderType'];
         $chat->receiver_id = $data['receiverId'];
@@ -221,8 +229,14 @@ class ServiceRequestService
 
     public function markAsSeen($requestId, $entityId, $entityType)
     {
-        $chats = Chat::where("user_service_request_id", $requestId)->where("receiver_type", $entityType)
-                    ->where("receiver_id", $entityId)->where("seen", false)->get();
+        $chats = Chat::where(function($q) use ($requestId) {
+            $q->where("user_service_request_id", $requestId)
+              ->orWhere(function($sub) use ($requestId) {
+                  $sub->where("requestable_id", $requestId)
+                      ->where("requestable_type", UserServiceRequest::$type);
+              });
+        })->where("receiver_type", $entityType)
+          ->where("receiver_id", $entityId)->where("seen", false)->get();
         if($chats->count() > 0) {
             foreach($chats as $chat) {
                 $chat->seen = true;
