@@ -7,6 +7,8 @@ use App\Models\Chat;
 use App\Models\User;
 use App\Models\UserProduct;
 use App\Exceptions\AppException;
+use App\Services\FcmService;
+use Illuminate\Support\Facades\Log;
 
 class UserProductRequestService
 {
@@ -38,6 +40,11 @@ class UserProductRequestService
         })->with(['userProduct.media', 'userProduct.product', 'userProduct.user', 'user', 'chats'])->find($id);
     }
 
+    public function getRequest($id, $with = ['userProduct.media', 'userProduct.product', 'userProduct.user', 'user', 'chats'])
+    {
+        return UserProductRequest::with($with)->find($id);
+    }
+
     public function createRequest(array $data, $userId)
     {
         $productId = $data['user_product_id'] ?? $data['productId'] ?? $data['userProductId'] ?? $data['product_id'] ?? null;
@@ -58,10 +65,20 @@ class UserProductRequestService
         $request->save();
 
         if (!empty($message) || !empty($data['mediaIds'])) {
-            $this->sendMessage($request, $data, $userId, $product->user_id);
+            $this->sendMessage($request, $data, $userId, $product->user_id, false);
         }
 
-        return $request->load(['userProduct.media', 'userProduct.product', 'userProduct.user', 'user', 'chats']);
+        $loadedRequest = $request->load(['userProduct.media', 'userProduct.product', 'userProduct.user', 'user', 'chats']);
+
+        $this->notifyUser(
+            $product->user_id,
+            'Product Request',
+            !empty($message) ? $message : 'You have a new product request',
+            'product_request',
+            ['request' => $loadedRequest]
+        );
+
+        return $loadedRequest;
     }
 
     public function changeStatus($id, $userId, $status)
@@ -72,10 +89,26 @@ class UserProductRequestService
         $request->Status = $status;
         $request->save();
 
+        $notifications = [
+            'accepted' => ['title' => 'Product Request Accepted', 'type' => 'request_accepted', 'message' => 'Your product request has been accepted'],
+            'declined' => ['title' => 'Product Request Declined', 'type' => 'request_declined', 'message' => 'Your product request has been declined'],
+            'provider_fulfilled' => ['title' => 'Product Request Fulfilled', 'type' => 'request_fulfilled', 'message' => 'Your product request has been marked as fulfilled by the provider'],
+        ];
+
+        if (isset($notifications[$status])) {
+            $this->notifyUser(
+                $request->user_id,
+                $notifications[$status]['title'],
+                $notifications[$status]['message'],
+                $notifications[$status]['type'],
+                ['request' => $request]
+            );
+        }
+
         return $request;
     }
 
-    public function sendMessage($inquiry, $data, $senderId, $receiverId)
+    public function sendMessage($inquiry, $data, $senderId, $receiverId, $notify = true)
     {
         if (\App\Models\UserBlock::where('user_id', $senderId)->where('blocked_user_id', $receiverId)->orWhere('user_id', $receiverId)->where('blocked_user_id', $senderId)->exists()) {
             throw new \App\Exceptions\AppException("Action blocked by user settings.");
@@ -102,6 +135,16 @@ class UserProductRequestService
             $chat->media()->sync($mediaIds);
         }
 
+        if ($notify) {
+            $this->notifyUser(
+                $receiverId,
+                'Request Chat',
+                $messageText ?? 'New message received',
+                'request_chat',
+                ['request' => $inquiry]
+            );
+        }
+
         return $chat;
     }
 
@@ -122,6 +165,40 @@ class UserProductRequestService
 
         $request->Status = $status;
         $request->save();
+
+        $providerUserId = $request->userProduct?->user_id;
+        $notifications = [
+            'fulfilled' => ['title' => 'Product Request Completed', 'type' => 'request_completed', 'message' => 'The customer has confirmed the product request as completed'],
+            'cancelled' => ['title' => 'Product Request Cancelled', 'type' => 'request_cancelled', 'message' => 'The product request has been cancelled by the customer'],
+        ];
+
+        if ($providerUserId && isset($notifications[$status])) {
+            $this->notifyUser(
+                $providerUserId,
+                $notifications[$status]['title'],
+                $notifications[$status]['message'],
+                $notifications[$status]['type'],
+                ['request' => $request]
+            );
+        }
+
         return $request;
+    }
+
+    protected function notifyUser($userId, string $title, string $message, string $type, array $meta = [])
+    {
+        try {
+            if (!$userId) return;
+            $fcmService = app(FcmService::class);
+            $fcmService->publish([
+                'topic' => 'user_' . $userId,
+                'message' => $message,
+                'title' => $title,
+                'type' => $type,
+                'meta' => $meta,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Failed to send FCM notification: " . $e->getMessage());
+        }
     }
 }
